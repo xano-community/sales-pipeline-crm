@@ -237,17 +237,26 @@ query "seed" verb=POST {
     }
 
     // --- Activities (deal resolved by name) ---
+    // Healthy open deals each carry an OPEN future task (so "no open activities"
+    // only fires on genuinely-neglected deals). The four stale deals keep only an
+    // old/no activity, and Umbrella carries one overdue task — so exactly five
+    // deals surface an attention alert.
     var $activities { value = [
-      { deal: "Acme line automation",     subtype: "call",    subject: "Intro call with ops lead",   due_days: -35, completed: true },
-      { deal: "Umbrella POS upgrade",     subtype: "task",    subject: "Send POS pricing sheet",     due_days: -2,  completed: false },
-      { deal: "Stark robotics contract",  subtype: "meeting", subject: "On-site solution demo",      due_days: 3,   completed: false },
-      { deal: "Globex telehealth rollout", subtype: "call",   subject: "Proposal walkthrough",       due_days: -3,  completed: true },
-      { deal: "Initech platform license", subtype: "email",   subject: "Share security whitepaper",  due_days: -2,  completed: true },
-      { deal: "Hooli migration",          subtype: "task",    subject: "Finalize statement of work", due_days: 5,   completed: false },
-      { deal: "Wayne fleet tracking",     subtype: "call",    subject: "Check-in with ops director", due_days: -12, completed: true },
-      { deal: "Acme spare parts",         subtype: "task",    subject: "Follow up on quote",         due_days: -1,  completed: false },
-      { deal: "Wonka packaging deal",     subtype: "call",    subject: "Discovery call",             due_days: -1,  completed: true },
-      { deal: "Stark robotics contract",  subtype: "task",    subject: "Legal redline review",       due_days: 2,   completed: false }
+      { deal: "Acme line automation",      subtype: "call",    subject: "Intro call with ops lead",     due_days: -35, completed: true },
+      { deal: "Globex telehealth rollout", subtype: "call",    subject: "Proposal walkthrough",         due_days: -3,  completed: true },
+      { deal: "Initech platform license",  subtype: "email",   subject: "Shared security whitepaper",   due_days: -2,  completed: true },
+      { deal: "Wayne fleet tracking",      subtype: "call",    subject: "Check-in with ops director",   due_days: -12, completed: true },
+      { deal: "Wonka packaging deal",      subtype: "call",    subject: "Discovery call",               due_days: -1,  completed: true },
+      { deal: "Hooli migration",           subtype: "meeting", subject: "Architecture review",          due_days: -6,  completed: true },
+      { deal: "Acme spare parts",          subtype: "task",    subject: "Follow up on quote",           due_days: 4,   completed: false },
+      { deal: "Globex telehealth rollout", subtype: "task",    subject: "Send revised proposal",        due_days: 3,   completed: false },
+      { deal: "Initech platform license",  subtype: "task",    subject: "Schedule technical review",    due_days: 5,   completed: false },
+      { deal: "Stark robotics contract",   subtype: "meeting", subject: "On-site solution demo",        due_days: 3,   completed: false },
+      { deal: "Stark robotics contract",   subtype: "task",    subject: "Legal redline review",         due_days: 2,   completed: false },
+      { deal: "Wayne fleet tracking",      subtype: "task",    subject: "Address security questions",   due_days: 6,   completed: false },
+      { deal: "Wonka packaging deal",      subtype: "task",    subject: "Qualify budget & timeline",    due_days: 2,   completed: false },
+      { deal: "Hooli migration",           subtype: "task",    subject: "Finalize statement of work",   due_days: 5,   completed: false },
+      { deal: "Umbrella POS upgrade",      subtype: "task",    subject: "Send POS pricing sheet",       due_days: -2,  completed: false }
     ] }
     foreach ($activities) {
       each as $act {

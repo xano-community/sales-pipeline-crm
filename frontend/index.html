@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Sales Pipeline CRM — Xano</title>
+<title>Sales CRM — Xano</title>
 <style>
   /* Salesforce Sales-Planning–inspired styling (not affiliated with Salesforce). */
   :root {
-    --navy:#022a54; --navy2:#03356a; --brand:#0176d3; --brand-dark:#014486;
+    --navy:#022a54; --brand:#0176d3; --brand-dark:#014486; --teal:#04b5b0;
     --bg:#f3f3f3; --card:#ffffff; --border:#e5e5e5; --border2:#c9c7c5;
     --ink:#181818; --muted:#706e6b; --green:#2e844a; --red:#ba0517; --amber:#dd7a01; --blue:#0176d3;
     --pink:#fddde1; --path-idle:#ecebea; --path-done:#c9c7c5;
@@ -15,6 +15,7 @@
   * { box-sizing:border-box; }
   body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; background:var(--bg); color:var(--ink); font-size:13px; }
   h1,h2,h3 { margin:0; }
+  svg { display:block; }
   button { font:inherit; cursor:pointer; border-radius:4px; padding:6px 14px; border:1px solid var(--border2); background:#fff; color:var(--brand); font-weight:600; }
   button.brand { background:var(--brand); border-color:var(--brand); color:#fff; }
   button.brand:hover { background:var(--brand-dark); }
@@ -35,23 +36,24 @@
   .okmsg { background:#eef7ee; color:var(--green); padding:9px 12px; border-radius:4px; font-size:12px; margin-bottom:10px; border-left:3px solid var(--green); }
   .muted { color:var(--muted); font-size:11px; }
 
-  /* Navy breadcrumb toolbar */
-  .toolbar { background:var(--navy); color:#fff; height:44px; display:flex; align-items:center; gap:10px; padding:0 16px; position:sticky; top:0; z-index:30; }
-  .toolbar .back { opacity:.75; cursor:pointer; }
-  .crumb { font-size:13px; display:flex; align-items:center; gap:8px; }
-  .crumb b { font-weight:700; } .crumb .sep { opacity:.4; }
-  .crumb .sel { opacity:.85; }
+  /* Navy toolbar with brand */
+  .toolbar { background:var(--navy); color:#fff; height:46px; display:flex; align-items:center; gap:10px; padding:0 16px; position:sticky; top:0; z-index:30; }
+  .brand-badge { width:28px; height:28px; border-radius:6px; background:linear-gradient(135deg,var(--teal),#0b8f8a); display:flex; align-items:center; justify-content:center; color:#fff; }
+  .brand-name { font-weight:700; font-size:15px; letter-spacing:.2px; }
+  .tb-div { width:1px; height:22px; background:rgba(255,255,255,.25); margin:0 6px; }
+  .crumb { font-size:12.5px; display:flex; align-items:center; gap:8px; opacity:.92; }
+  .crumb b { font-weight:600; } .crumb .sep { opacity:.4; }
   .toolbar .upd { margin-left:auto; font-size:11px; opacity:.7; }
   .toolbar .who { font-size:11px; opacity:.85; margin-left:14px; }
   .toolbar .out { background:transparent; border:1px solid rgba(255,255,255,.35); color:#fff; }
-  /* tab strip */
-  .tabs { background:#fff; border-bottom:1px solid var(--border); padding:0 16px; display:flex; gap:2px; position:sticky; top:44px; z-index:20; }
-  .tabs button { background:transparent; border:none; border-bottom:3px solid transparent; border-radius:0; color:var(--muted); padding:11px 16px; font-weight:600; }
+  .tabs { background:#fff; border-bottom:1px solid var(--border); padding:0 16px; display:flex; gap:2px; position:sticky; top:46px; z-index:20; }
+  .tabs button { background:transparent; border:none; border-bottom:3px solid transparent; border-radius:0; color:var(--muted); padding:11px 16px; font-weight:600; display:flex; align-items:center; gap:7px; }
   .tabs button.active { color:var(--brand); border-bottom-color:var(--brand); }
+  .tabs button svg { width:15px; height:15px; }
 
   /* dashboard layout */
   .dash { display:grid; grid-template-columns:290px 1fr; gap:0; align-items:start; }
-  .rail { background:#fff; border-right:1px solid var(--border); min-height:calc(100vh - 84px); padding:18px 16px; }
+  .rail { background:#fff; border-right:1px solid var(--border); min-height:calc(100vh - 86px); padding:18px 16px; }
   .rail h2 { font-size:16px; }
   .rail .sub { font-size:12px; color:var(--muted); margin:2px 0 10px; }
   .rail .desc { font-size:12px; color:#3e3e3c; line-height:1.5; }
@@ -59,7 +61,7 @@
   .avstack { display:flex; }
   .avstack .a { width:20px; height:20px; border-radius:50%; background:#1b96ff; color:#fff; font-size:9px; font-weight:700; display:flex; align-items:center; justify-content:center; border:1.5px solid #fff; margin-left:-6px; }
   .avstack .a:first-child { margin-left:0; }
-  .railsec { border-top:1px solid var(--border); padding:11px 0 4px; font-size:12px; font-weight:700; color:#3e3e3c; display:flex; justify-content:space-between; cursor:pointer; }
+  .railsec { border-top:1px solid var(--border); padding:11px 0 4px; font-size:12px; font-weight:700; color:#3e3e3c; display:flex; justify-content:space-between; }
   .feed { border-top:1px solid var(--border); padding-top:10px; }
   .fitem { display:flex; gap:9px; margin-bottom:13px; }
   .fitem .a { width:26px; height:26px; border-radius:50%; background:#5867e8; color:#fff; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; flex:0 0 26px; }
@@ -72,25 +74,27 @@
   .kpis { display:flex; border:1px solid var(--border); border-radius:8px; background:#fff; overflow:hidden; margin-bottom:18px; flex-wrap:wrap; }
   .kpi { flex:1 1 0; min-width:150px; padding:13px 16px; display:flex; gap:11px; align-items:center; border-right:1px solid var(--border); }
   .kpi:last-child { border-right:none; }
-  .kpi .ic { width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; flex:0 0 26px; }
+  .kpi .ic { width:28px; height:28px; border-radius:7px; display:flex; align-items:center; justify-content:center; flex:0 0 28px; }
+  .kpi .ic svg { width:16px; height:16px; }
   .kpi .lab { font-size:11px; color:var(--muted); } .kpi .val { font-size:20px; font-weight:700; }
 
   /* Summary table */
-  .summary { background:#fff; border:1px solid var(--border); border-radius:8px; }
+  .summary { background:#fff; border:1px solid var(--border); border-radius:8px; overflow-x:auto; }
   .summary .sh { padding:11px 14px; border-bottom:1px solid var(--border); font-weight:700; font-size:14px; }
   .stbl { width:100%; border-collapse:collapse; font-size:12px; }
   .stbl th, .stbl td { padding:8px 10px; border-bottom:1px solid #eee; text-align:right; white-space:nowrap; }
   .stbl th.l, .stbl td.l { text-align:left; }
   .grp th { font-size:10px; text-transform:uppercase; letter-spacing:.05em; color:var(--muted); border-bottom:1px solid var(--border); text-align:center; background:#fafaf9; padding:5px 10px; }
-  .grp th.gborder { border-left:1px solid var(--border); }
-  .col2 th { font-size:10px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); background:#fff; position:sticky; }
-  .stbl tr:hover td { background:#f8fbfe; }
+  .grp th.gborder, .stbl td.gborder, .col2 th.gborder { border-left:1px solid var(--border); }
+  .col2 th { font-size:10px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); background:#fff; }
+  .stbl tbody tr:hover td { background:#f8fbfe; }
   .name { display:flex; align-items:center; gap:6px; }
-  .chev { width:14px; display:inline-block; color:var(--muted); cursor:pointer; user-select:none; }
+  .chev { width:14px; display:inline-block; color:var(--muted); cursor:pointer; user-select:none; font-size:10px; }
   .row-all td { font-weight:700; background:#fbfbfa; }
   .row-rep td { font-weight:600; }
-  .row-deal td { color:#3e3e3c; }
-  .att-hot { background:var(--pink) !important; color:var(--red); font-weight:700; border-radius:3px; }
+  .row-acct td { color:#3e3e3c; }
+  .row-deal td { color:#54544f; }
+  .att-hot { background:var(--pink) !important; color:var(--red); font-weight:700; }
   .badge { display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:600; }
   .badge .d { width:8px; height:8px; border-radius:50%; }
   .b-green{color:var(--green)} .b-green .d{background:var(--green)}
@@ -100,13 +104,16 @@
 
   /* Kanban */
   .board { display:flex; gap:12px; overflow-x:auto; padding-bottom:10px; align-items:flex-start; }
-  .col { flex:0 0 250px; background:#ebeef1; border-radius:8px; }
+  .col { flex:0 0 250px; background:#ebeef1; border-radius:8px; transition:background .12s; }
+  .col.drop { background:#d6e8fb; outline:2px dashed var(--brand); }
   .col .h { padding:9px 11px; border-bottom:2px solid var(--brand); border-radius:8px 8px 0 0; background:#fff; }
+  .col.won-col .h { border-bottom-color:var(--green); } .col.lost-col .h { border-bottom-color:var(--red); }
   .col .h .nm { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.03em; color:#3e3e3c; }
   .col .h .sum { font-size:11px; color:var(--muted); margin-top:2px; }
-  .col .body { padding:9px; min-height:40px; }
+  .col .body { padding:9px; min-height:60px; }
   .deal { background:#fff; border:1px solid var(--border); border-radius:6px; padding:10px; margin-bottom:8px; cursor:pointer; box-shadow:0 1px 1px rgba(0,0,0,.04); }
   .deal:hover { border-color:var(--brand); }
+  .deal.dragging { opacity:.4; }
   .deal .nm { font-weight:700; font-size:13px; color:var(--brand-dark); }
   .deal .acct { font-size:12px; color:var(--muted); margin-top:1px; }
   .deal .amt { font-size:14px; font-weight:700; margin-top:7px; }
@@ -114,12 +121,14 @@
   .deal .foot { display:flex; justify-content:space-between; align-items:center; margin-top:8px; }
   .chip { font-size:10px; padding:2px 8px; border-radius:11px; background:#eef4fb; color:var(--brand-dark); font-weight:600; }
   .chip.won { background:#eef7ee; color:var(--green); } .chip.lost { background:#fdecea; color:var(--red); }
-  .alert { color:var(--amber); font-size:15px; cursor:help; }
+  .alert { color:var(--amber); display:inline-flex; }
   .acts { display:flex; gap:5px; margin-top:8px; flex-wrap:wrap; }
   .objhead { background:#fff; border-bottom:1px solid var(--border); padding:12px 20px; display:flex; align-items:center; gap:12px; }
-  .objicon { width:34px; height:34px; border-radius:6px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:17px; }
+  .objicon { width:34px; height:34px; border-radius:7px; display:flex; align-items:center; justify-content:center; color:#fff; }
+  .objicon svg { width:18px; height:18px; }
   .objhead .t { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; }
   .objhead .n { font-size:17px; font-weight:700; }
+  .kbhint { font-size:11px; color:var(--muted); margin:0 20px 10px; }
 
   /* record drawer */
   .scrim { position:fixed; inset:0; background:rgba(3,20,40,.35); display:none; z-index:40; }
@@ -132,7 +141,10 @@
   .rechead .n { font-size:19px; font-weight:700; }
   .highlights { display:flex; gap:26px; margin-top:12px; flex-wrap:wrap; }
   .highlights .f .k { font-size:11px; color:var(--muted); } .highlights .f .v { font-size:14px; font-weight:600; }
+  .attn-banner { background:#fef4e8; border-top:1px solid #f5d9b0; border-bottom:1px solid #f5d9b0; padding:10px 20px; display:flex; align-items:center; gap:10px; color:#8a5000; font-size:12px; }
+  .attn-banner .b { font-weight:700; }
   .path-wrap { padding:14px 20px; background:#fff; border-bottom:1px solid var(--border); }
+  .path-label { font-size:11px; color:var(--muted); margin-bottom:7px; }
   .path { display:flex; gap:3px; overflow-x:auto; }
   .path .step { flex:1; min-width:104px; height:36px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; background:var(--path-idle); color:#514f4d; cursor:pointer; white-space:nowrap; clip-path:polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%, 15px 50%); padding-left:15px; }
   .path .step:first-child { clip-path:polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%); padding-left:4px; }
@@ -150,6 +162,7 @@
   .tl .ev { margin-bottom:11px; position:relative; }
   .tl .ev::before { content:""; position:absolute; left:-17px; top:3px; width:9px; height:9px; border-radius:50%; background:var(--brand); border:2px solid #fff; }
   .tl .ev.done::before { background:var(--green); }
+  .tl .ev.overdue::before { background:var(--red); }
   .tl .ev .t2 { font-size:12px; font-weight:600; } .tl .ev .m { font-size:11px; color:var(--muted); }
 
   table.lead { width:100%; border-collapse:collapse; font-size:12px; }
@@ -163,7 +176,7 @@
 
 <div id="setup" class="center hidden">
   <div class="card setup">
-    <h1>Sales Pipeline CRM</h1>
+    <h1>Sales CRM</h1>
     <p>A Salesforce-style deal pipeline on Xano. Enter your Xano instance base URL to begin.</p>
     <label>Instance base URL</label>
     <input id="baseUrl" placeholder="https://your-instance.xano.io" />
@@ -190,16 +203,18 @@
 
 <div id="app" class="hidden">
   <div class="toolbar">
-    <span class="back">&larr;</span>
-    <div class="crumb"><b>Q3 Pipeline Plan</b> <span class="sep">&rsaquo;</span> <span id="crumbView">Overview</span> <span class="sep">&rsaquo;</span> <span class="sel">Select &#9662;</span></div>
+    <span class="brand-badge" id="brandBadge"></span>
+    <span class="brand-name">Sales CRM</span>
+    <span class="tb-div"></span>
+    <div class="crumb"><b>Q3 Pipeline Plan</b> <span class="sep">&rsaquo;</span> <span id="crumbView">Overview</span></div>
     <span id="lastUpd" class="upd"></span>
     <span id="whoami" class="who"></span>
     <button class="out sm" onclick="logout()">Log Out</button>
   </div>
   <div class="tabs">
-    <button data-view="dash" class="active" onclick="go('dash')">Dashboard</button>
-    <button data-view="board" onclick="go('board')">Pipeline</button>
-    <button data-view="leads" onclick="go('leads')">Leads</button>
+    <button data-view="dash" class="active" onclick="go('dash')"><span id="tabIconDash"></span>Dashboard</button>
+    <button data-view="board" onclick="go('board')"><span id="tabIconBoard"></span>Pipeline</button>
+    <button data-view="leads" onclick="go('leads')"><span id="tabIconLeads"></span>Leads</button>
   </div>
   <div id="viewErr" style="padding:0 20px"></div>
   <div id="v-dash"></div>
@@ -212,14 +227,29 @@
 
 <script>
 const LS = { cfg:'salescrm:cfg', token:'salescrm:token', user:'salescrm:user' };
-let cfg = loadCfg(); let STAGES=[]; let DASH=null; const EXP=new Set(['all']);
+let cfg = loadCfg(); let STAGES=[]; let DASH=null; const EXP=new Set(['all']); let DRAGID=null;
 const AUTH='/api:salescrm-auth', CRM='/api:salescrm-crm', AN='/api:salescrm-analytics', SEED='/api:salescrm-seed';
+
+/* ---- inline SVG icons ---- */
+const IC = {
+  chart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5M4 19h16M8 16v-4M12 16V8M16 16v-6"/><path d="M14 6l3-2 3 3" stroke-width="2"/></svg>',
+  briefcase:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18"/></svg>',
+  target:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>',
+  gauge:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20a8 8 0 1 1 16 0"/><path d="M12 20l4-6"/></svg>',
+  layers:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3l9 5-9 5-9-5 9-5zM3 13l9 5 9-5"/></svg>',
+  clock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg>',
+  warn:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 17H2L12 3z"/><path d="M12 9v5M12 17v.5"/></svg>',
+  dollar:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v18M16 7c0-2-2-3-4-3s-4 1-4 3 2 3 4 3 4 1 4 3-2 3-4 3-4-1-4-3"/></svg>',
+  scale:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M5 7h14M7 7l-3 6a3 3 0 0 0 6 0L7 7zM17 7l-3 6a3 3 0 0 0 6 0l-3-6z"/></svg>',
+};
+function icon(n){ return IC[n]||''; }
 
 function loadCfg(){ const r=localStorage.getItem(LS.cfg); return r?JSON.parse(r):{baseUrl:''}; }
 function getToken(){ return localStorage.getItem(LS.token); }
 function getUser(){ const r=localStorage.getItem(LS.user); return r?JSON.parse(r):null; }
 function normalizeBase(u){ return (u||'').trim().replace(/\/+$/,''); }
-function money(n){ n=n||0; if(Math.abs(n)>=1000) return '$'+Math.round(n).toLocaleString(); return '$'+Math.round(n); }
+function money(n){ n=n||0; return '$'+Math.round(n).toLocaleString(); }
 function esc(s){ return (s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 function initials(n){ return (n||'?').split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase(); }
 function fdate(ms){ return ms? new Date(ms).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}):'—'; }
@@ -244,6 +274,10 @@ function route(){
   if(!cfg.baseUrl){ document.getElementById('setup').classList.remove('hidden'); return; }
   if(!getToken()){ document.getElementById('login').classList.remove('hidden'); return; }
   document.getElementById('app').classList.remove('hidden');
+  document.getElementById('brandBadge').innerHTML=icon('chart');
+  document.getElementById('tabIconDash').innerHTML=icon('gauge');
+  document.getElementById('tabIconBoard').innerHTML=icon('briefcase');
+  document.getElementById('tabIconLeads').innerHTML=icon('target');
   const u=getUser(); document.getElementById('whoami').textContent=u?`${u.name} · ${u.role}`:'';
   document.getElementById('lastUpd').textContent='Last updated: just now';
   go('dash');
@@ -260,27 +294,24 @@ function go(view){
 }
 
 /* ---------- DASHBOARD ---------- */
+function agg(deals){
+  const open=deals.filter(d=>!d.is_closed); const s=(a,f)=>a.reduce((x,d)=>x+(f(d)||0),0);
+  return { count:deals.length, openN:open.length, openAmount:s(open,d=>d.amount), weighted:s(open,d=>d.expected_revenue),
+    commit:s(open.filter(d=>d.forecast_category==='Commit'),d=>d.amount),
+    bestcase:s(open.filter(d=>d.forecast_category==='BestCase'),d=>d.amount),
+    won:s(deals.filter(d=>d.is_won),d=>d.amount),
+    attention:open.filter(d=>d.alerts&&d.alerts.needs_attention).length };
+}
+function statusOf(a){ return a.attention>0?'attention':(a.openN>0?'progress':(a.won>0?'ontrack':'none')); }
 async function renderDash(){
   const el=document.getElementById('v-dash'); el.innerHTML='<div style="padding:20px" class="muted">Loading dashboard…</div>';
   try{
-    const [stats,fc,board,feed]=await Promise.all([ api(`${AN}/dashboard/stats`), api(`${AN}/forecast`), api(`${CRM}/board`), api(`${AN}/activity-feed`) ]);
+    const [stats,fc,board,feed,accounts]=await Promise.all([ api(`${AN}/dashboard/stats`), api(`${AN}/forecast`), api(`${CRM}/board`), api(`${AN}/activity-feed`), api(`${CRM}/accounts`) ]);
     STAGES=board.map(c=>c.stage);
     const deals=board.flatMap(c=>c.deals);
-    // per-rep aggregation
-    const reps=fc.map(r=>{
-      const rd=deals.filter(d=>d.owner_id===r.user_id);
-      const open=rd.filter(d=>!d.is_closed);
-      const sum=(a,f)=>a.reduce((s,d)=>s+(f(d)||0),0);
-      const att=open.filter(d=>d.alerts&&d.alerts.needs_attention).length;
-      return { ...r, deals:rd, count:rd.length,
-        openAmount:sum(open,d=>d.amount), weighted:sum(open,d=>d.expected_revenue),
-        commit:sum(open.filter(d=>d.forecast_category==='Commit'),d=>d.amount),
-        bestcase:sum(open.filter(d=>d.forecast_category==='BestCase'),d=>d.amount),
-        attention:att,
-        status: att>0?'attention':(open.length?'progress':(r.won_amount>0?'ontrack':'none')) };
-    }).filter(r=>r.count>0 || r.won_amount>0);
-    DASH={ stats, reps, deals, feed:(feed.items||feed||[]) };
-    el.innerHTML = dashHtml();
+    const accMap={}; accounts.forEach(a=>accMap[a.id]=a.name);
+    DASH={ stats, fc, deals, accMap, feed:(feed.items||feed||[]) };
+    el.innerHTML=dashHtml();
   }catch(e){ showErr('viewErr',e.message); el.innerHTML=''; }
 }
 function badge(status){
@@ -289,8 +320,9 @@ function badge(status){
 }
 function dealStatus(d){ return d.is_won?'won':(d.status==='lost'?'lost':((d.alerts&&d.alerts.needs_attention)?'attention':'progress')); }
 function dashHtml(){
-  const s=DASH.stats, reps=DASH.reps, deals=DASH.deals;
+  const s=DASH.stats, deals=DASH.deals, accMap=DASH.accMap;
   const total=deals.length, open=deals.filter(d=>!d.is_closed).length, won=deals.filter(d=>d.is_won).length, att=deals.filter(d=>!d.is_closed&&d.alerts&&d.alerts.needs_attention).length;
+  const reps=DASH.fc.map(r=>({...r, deals:deals.filter(d=>d.owner_id===r.user_id)})).filter(r=>r.deals.length||r.won_amount>0);
   // rail
   const shareInit=reps.slice(0,5).map(r=>`<div class="a">${initials(r.name)}</div>`).join('');
   const feed=DASH.feed.map(f=>`<div class="fitem"><div class="a">${initials(f.user_name)}</div><div class="txt"><b>${esc(f.user_name)}</b> advanced <b>${esc(f.deal_name)}</b> to ${esc(f.stage_name)}<div class="when">${rel(f.changed_at)}</div></div></div>`).join('')||'<div class="muted">No recent activity</div>';
@@ -301,84 +333,94 @@ function dashHtml(){
     <div class="railsec">Scenario Elements <span class="muted">&rsaquo;</span></div>
     <div class="railsec">Milestones <span class="muted">&rsaquo;</span></div>
     <div class="railsec" style="border-bottom:none">History</div>
-    <div class="feed">${feed}</div>
-  </div>`;
+    <div class="feed">${feed}</div></div>`;
   // kpis
-  const kpi=(bg,ic,lab,val)=>`<div class="kpi"><div class="ic" style="background:${bg}">${ic}</div><div><div class="lab">${lab}</div><div class="val">${val}</div></div></div>`;
+  const kpi=(bg,fg,ic,lab,val)=>`<div class="kpi"><div class="ic" style="background:${bg};color:${fg}">${icon(ic)}</div><div><div class="lab">${lab}</div><div class="val">${val}</div></div></div>`;
   const kpis=`<div class="kpis">
-    ${kpi('#e8f4fd','📊','Total Deals',total)}
-    ${kpi('#eef1f6','◷','Open',open)}
-    ${kpi('#e4f4ea','✓','Won',won)}
-    ${kpi('#fdecea','⚠','Needs Attention',`<span style="color:${att?'var(--red)':'inherit'}">${att}</span>`)}
-    ${kpi('#e8f4fd','$','Open Pipeline',money(s.forecast.open_pipeline))}
-    ${kpi('#e8f4fd','≈','Weighted',money(s.forecast.weighted_expected))}
+    ${kpi('#e8f4fd','var(--brand)','layers','Total Deals',total)}
+    ${kpi('#eef1f6','#5a6b7b','clock','Open',open)}
+    ${kpi('#e4f4ea','var(--green)','check','Won',won)}
+    ${kpi('#fdecea',att?'var(--red)':'#9a9a9a','warn','Needs Attention',`<span style="color:${att?'var(--red)':'inherit'}">${att}</span>`)}
+    ${kpi('#e8f4fd','var(--brand)','dollar','Open Pipeline',money(s.forecast.open_pipeline))}
+    ${kpi('#eef7f7','var(--teal)','scale','Weighted',money(s.forecast.weighted_expected))}
   </div>`;
-  // summary table
+  // summary hierarchy: All -> Rep -> Account -> Deal
   const rows=[];
-  const allC=reps.reduce((a,r)=>({count:a.count+r.count,openAmount:a.openAmount+r.openAmount,weighted:a.weighted+r.weighted,commit:a.commit+r.commit,bestcase:a.bestcase+r.bestcase,won:a.won+r.won_amount,attention:a.attention+r.attention}),{count:0,openAmount:0,weighted:0,commit:0,bestcase:0,won:0,attention:0});
-  rows.push(sumRow({key:'all',level:0,name:'All Pipeline',expandable:true,expanded:EXP.has('all'),status:allC.attention>0?'attention':'progress',count:allC.count,openAmount:allC.openAmount,weighted:allC.weighted,commit:allC.commit,bestcase:allC.bestcase,won:allC.won,attention:allC.attention,attain:null}));
+  const allA=agg(deals);
+  rows.push(sumRow({key:'all',level:0,name:'All Pipeline',expandable:true,a:allA,attain:null}));
   if(EXP.has('all')) for(const r of reps){
-    const key='rep'+r.user_id;
-    rows.push(sumRow({key,level:1,name:r.name,expandable:r.deals.length>0,expanded:EXP.has(key),status:r.status,count:r.count,openAmount:r.openAmount,weighted:r.weighted,commit:r.commit,bestcase:r.bestcase,won:r.won_amount,attention:r.attention,attain:{pct:r.attainment_pct,band:r.band}}));
-    if(EXP.has(key)) for(const d of r.deals){
-      rows.push(dealRow(d));
+    const rkey='rep'+r.user_id, ra=agg(r.deals);
+    rows.push(sumRow({key:rkey,level:1,name:r.name,expandable:r.deals.length>0,a:ra,attain:{pct:r.attainment_pct,band:r.band}}));
+    if(EXP.has(rkey)){
+      const byAcct={}; r.deals.forEach(d=>{ (byAcct[d.account_id]=byAcct[d.account_id]||[]).push(d); });
+      for(const acctId of Object.keys(byAcct)){
+        const akey='acct'+r.user_id+'_'+acctId, ad=byAcct[acctId], aa=agg(ad);
+        rows.push(sumRow({key:akey,level:2,name:accMap[acctId]||('Account #'+acctId),expandable:true,a:aa,attain:null}));
+        if(EXP.has(akey)) for(const d of ad) rows.push(dealRow(d));
+      }
     }
   }
   const table=`<div class="summary"><div class="sh">Summary</div>
-    <table class="stbl">
-      <thead>
-        <tr class="grp"><th></th><th></th><th class="gborder" colspan="3">Pipeline</th><th class="gborder" colspan="3">Forecast</th><th class="gborder" colspan="2">Health</th></tr>
-        <tr class="col2"><th class="l">Name</th><th class="l">Status</th><th class="gborder">Deals</th><th>Open Amt</th><th>Weighted</th><th class="gborder">Commit</th><th>Best Case</th><th>Won</th><th class="gborder">Attention</th><th>Attainment</th></tr>
-      </thead>
-      <tbody>${rows.join('')}</tbody>
-    </table></div>`;
+    <table class="stbl"><thead>
+      <tr class="grp"><th></th><th></th><th class="gborder" colspan="3">Pipeline</th><th class="gborder" colspan="3">Forecast</th><th class="gborder" colspan="2">Health</th></tr>
+      <tr class="col2"><th class="l">Name</th><th class="l">Status</th><th class="gborder">Deals</th><th>Open Amt</th><th>Weighted</th><th class="gborder">Commit</th><th>Best Case</th><th>Won</th><th class="gborder">Attention</th><th>Attainment</th></tr>
+    </thead><tbody>${rows.join('')}</tbody></table></div>`;
   return `<div class="dash">${rail}<div class="main"><h3 class="hdr">Pipeline is in progress</h3>${kpis}${table}</div></div>`;
 }
 function sumRow(r){
-  const chev=r.expandable?`<span class="chev" onclick="toggleRow('${r.key}')">${r.expanded?'▾':'▸'}</span>`:'<span class="chev"></span>';
-  const pad=r.level*16;
+  const a=r.a, cls=['row-all','row-rep','row-acct'][r.level];
+  const chev=r.expandable?`<span class="chev" onclick="toggleRow('${r.key}')">${EXP.has(r.key)?'▾':'▸'}</span>`:'<span class="chev"></span>';
   const attain=r.attain?`<span class="badge b-${r.attain.band}"><span class="d"></span>${r.attain.pct}%</span>`:'—';
-  const attCell=r.attention>0?`<td class="gborder att-hot">${r.attention} ⚠</td>`:`<td class="gborder">—</td>`;
-  return `<tr class="row-${r.level===0?'all':'rep'}">
-    <td class="l"><span class="name" style="padding-left:${pad}px">${chev}${esc(r.name)}</span></td>
-    <td class="l">${badge(r.status)}</td>
-    <td class="gborder">${r.count}</td><td>${money(r.openAmount)}</td><td>${money(r.weighted)}</td>
-    <td class="gborder">${money(r.commit)}</td><td>${money(r.bestcase)}</td><td>${r.won?money(r.won):'—'}</td>
-    ${attCell}<td>${attain}</td>
-  </tr>`;
+  const attCell=a.attention>0?`<td class="gborder att-hot">${a.attention} ⚠</td>`:`<td class="gborder">—</td>`;
+  return `<tr class="${cls}">
+    <td class="l"><span class="name" style="padding-left:${r.level*16}px">${chev}${esc(r.name)}</span></td>
+    <td class="l">${badge(statusOf(a))}</td>
+    <td class="gborder">${a.count}</td><td>${money(a.openAmount)}</td><td>${money(a.weighted)}</td>
+    <td class="gborder">${a.commit?money(a.commit):'—'}</td><td>${a.bestcase?money(a.bestcase):'—'}</td><td>${a.won?money(a.won):'—'}</td>
+    ${attCell}<td>${attain}</td></tr>`;
 }
 function dealRow(d){
-  const st=dealStatus(d); const pad=2*16;
   const hot=(!d.is_closed&&d.alerts&&d.alerts.needs_attention);
   return `<tr class="row-deal" style="cursor:pointer" onclick="openDeal(${d.id})">
-    <td class="l"><span class="name" style="padding-left:${pad}px"><span class="chev"></span>${esc(d.name)}</span></td>
-    <td class="l">${badge(st)}</td>
+    <td class="l"><span class="name" style="padding-left:48px"><span class="chev"></span>${esc(d.name)}</span></td>
+    <td class="l">${badge(dealStatus(d))}</td>
     <td class="gborder">—</td><td>${d.is_closed?'—':money(d.amount)}</td><td>${d.is_closed?'—':money(d.expected_revenue)}</td>
     <td class="gborder">${(!d.is_closed&&d.forecast_category==='Commit')?money(d.amount):'—'}</td>
     <td>${(!d.is_closed&&d.forecast_category==='BestCase')?money(d.amount):'—'}</td>
     <td>${d.is_won?money(d.amount):'—'}</td>
-    <td class="gborder ${hot?'att-hot':''}">${hot?'⚠':'—'}</td><td>—</td>
-  </tr>`;
+    <td class="gborder ${hot?'att-hot':''}">${hot?'⚠':'—'}</td><td>—</td></tr>`;
 }
 function toggleRow(key){ if(EXP.has(key))EXP.delete(key); else EXP.add(key); document.getElementById('v-dash').innerHTML=dashHtml(); }
 
-/* ---------- KANBAN ---------- */
+/* ---------- KANBAN (with drag & drop) ---------- */
 async function renderBoard(){
   document.getElementById('viewErr').innerHTML='';
-  const el=document.getElementById('v-board'); el.innerHTML=`<div class="objhead"><div class="objicon" style="background:#fcb95b">💼</div><div><div class="t">Opportunities</div><div class="n">Pipeline Board</div></div></div><div style="padding:18px 20px"><div class="muted">Loading pipeline…</div></div>`;
+  const el=document.getElementById('v-board');
+  el.innerHTML=`<div class="objhead"><div class="objicon" style="background:#0176d3">${icon('briefcase')}</div><div><div class="t">Opportunities</div><div class="n">Pipeline Board</div></div></div><div class="kbhint">Drag a card to another stage to advance it — or into Closed Won / Closed Lost to close it.</div><div id="boardWrap" style="padding:0 20px 18px"><div class="muted">Loading pipeline…</div></div>`;
   try{
     const board=await api(`${CRM}/board`); STAGES=board.map(c=>c.stage);
-    el.innerHTML=`<div class="objhead"><div class="objicon" style="background:#fcb95b">💼</div><div><div class="t">Opportunities</div><div class="n">Pipeline Board</div></div></div><div style="padding:18px 20px"><div class="board">${board.map(colHtml).join('')}</div></div>`;
+    document.getElementById('boardWrap').innerHTML=`<div class="board">${board.map(colHtml).join('')}</div>`;
   }catch(e){ showErr('viewErr',e.message); }
 }
-function colHtml(c){ const sum=c.deals.reduce((a,d)=>a+(d.amount||0),0); const cards=c.deals.map(dealCard).join('')||'<div class="muted" style="padding:6px">No opportunities</div>'; return `<div class="col"><div class="h"><div class="nm">${esc(c.stage.name)}</div><div class="sum">${c.deals.length} · ${money(sum)}</div></div><div class="body">${cards}</div></div>`; }
+function colHtml(c){
+  const s=c.stage, sum=c.deals.reduce((a,d)=>a+(d.amount||0),0);
+  const cards=c.deals.map(dealCard).join('')||'<div class="muted" style="padding:6px">Drop a deal here</div>';
+  const cls=s.is_won?'won-col':(s.is_closed?'lost-col':'');
+  return `<div class="col ${cls}" ondragover="allowDrop(event,this)" ondragleave="this.classList.remove('drop')" ondrop="dropCard(event,this,${s.id},${!!s.is_won},${!!s.is_closed&&!s.is_won})">
+    <div class="h"><div class="nm">${esc(s.name)}</div><div class="sum">${c.deals.length} · ${money(sum)}</div></div>
+    <div class="body">${cards}</div></div>`;
+}
 function alertTitle(a){ const t=[]; if(a.overdue_task)t.push('Overdue task'); if(a.no_open_activities)t.push('No open activities'); if(a.no_activity_30_days)t.push('No activity for 30 days'); return t.join(' • '); }
 function dealCard(d){
   const a=d.alerts||{}, closed=d.is_closed;
-  const alert=(!closed&&a.needs_attention)?`<span class="alert" title="${esc(alertTitle(a))}">&#9888;</span>`:'';
+  const alert=(!closed&&a.needs_attention)?`<span class="alert" title="${esc(alertTitle(a))}" style="width:15px;height:15px">${icon('warn')}</span>`:'';
   const actions=closed?`<div class="acts"><span class="chip ${d.is_won?'won':'lost'}">${d.is_won?'Closed Won':'Closed Lost'}</span></div>`:`<div class="acts"><button class="sm neutral" onclick="event.stopPropagation();advance(${d.id})">Advance &rarr;</button><button class="sm neutral" style="color:var(--green)" onclick="event.stopPropagation();won(${d.id})">Won</button><button class="sm neutral" style="color:var(--red)" onclick="event.stopPropagation();lost(${d.id})">Lost</button></div>`;
-  return `<div class="deal" onclick="openDeal(${d.id})"><div class="row"><div class="grow"><div class="nm">${esc(d.name)}</div><div class="acct">Acct #${d.account_id}</div></div>${alert}</div><div class="amt">${money(d.amount)} <span class="er">· ${money(d.expected_revenue)} exp (${d.probability}%)</span></div><div class="foot"><span class="chip">${esc(d.forecast_category)}</span><span class="muted">Owner #${d.owner_id}</span></div>${actions}</div>`;
+  const drag=closed?'':`draggable="true" ondragstart="dragStart(event,${d.id},this)" ondragend="this.classList.remove('dragging')"`;
+  return `<div class="deal" ${drag} onclick="openDeal(${d.id})"><div class="row"><div class="grow"><div class="nm">${esc(d.name)}</div><div class="acct">${esc(DASH&&DASH.accMap&&DASH.accMap[d.account_id]?DASH.accMap[d.account_id]:('Acct #'+d.account_id))}</div></div>${alert}</div><div class="amt">${money(d.amount)} <span class="er">· ${money(d.expected_revenue)} exp (${d.probability}%)</span></div><div class="foot"><span class="chip">${esc(d.forecast_category)}</span><span class="muted">Owner #${d.owner_id}</span></div>${actions}</div>`;
 }
+function dragStart(e,id,elt){ DRAGID=id; elt.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; }
+function allowDrop(e,col){ e.preventDefault(); col.classList.add('drop'); }
+function dropCard(e,col,stageId,isWon,isLost){ e.preventDefault(); col.classList.remove('drop'); if(!DRAGID)return; const id=DRAGID; DRAGID=null; if(isWon)won(id); else if(isLost)lost(id); else advance(id,stageId); }
 function nextStage(curSort){ return STAGES.filter(s=>!s.is_closed&&s.sort_order>curSort).sort((a,b)=>a.sort_order-b.sort_order)[0]; }
 async function advance(id,toStageId){ try{ let t=toStageId; if(!t){ const d=await api(`${CRM}/deals/${id}`); const n=nextStage(d.stage.sort_order); if(!n){alert('Already at the last open stage — mark Won or Lost.');return;} t=n.id; } await api(`${CRM}/deals/${id}/advance`,{method:'POST',body:JSON.stringify({deal_id:id,stage_id:t})}); refreshAfter(id); }catch(e){ alert(e.message); } }
 async function won(id){ try{ await api(`${CRM}/deals/${id}/won`,{method:'POST',body:JSON.stringify({deal_id:id})}); refreshAfter(id); }catch(e){ alert(e.message);} }
@@ -394,6 +436,16 @@ function pathHtml(deal){
   const cs=cur?cur.sort_order:0;
   return open.map(s=>{ const cls=s.id===deal.stage_id?'current':(s.sort_order<cs?'done':''); return `<div class="step ${cls}" title="Move to ${esc(s.name)}" onclick="advance(${deal.id},${s.id})">${esc(s.name)}</div>`; }).join('');
 }
+function attnInfo(d,activities){
+  if(d.is_closed) return null;
+  const openA=(activities||[]).filter(a=>!a.is_closed);
+  const overdue=openA.some(a=>a.due_at&&a.due_at<Date.now());
+  const noOpen=openA.length===0;
+  const ref=d.last_activity_at||d.created_at;
+  const stale=ref&&((Date.now()-ref)/86400000>=30);
+  const r=[]; if(overdue)r.push('an overdue task'); if(noOpen)r.push('no open activities'); if(stale)r.push('no activity in 30+ days');
+  return r.length?r:null;
+}
 async function openDeal(id){
   const dr=document.getElementById('drawer'); document.getElementById('scrim').classList.add('open'); dr.classList.add('open');
   if(!dr.innerHTML.includes('data-deal="'+id+'"')) dr.innerHTML='<div style="padding:24px" class="muted">Loading…</div>';
@@ -401,11 +453,13 @@ async function openDeal(id){
     if(!STAGES.length){ const b=await api(`${CRM}/board`); STAGES=b.map(c=>c.stage); }
     const x=await api(`${CRM}/deals/${id}`); const d=x.deal;
     const roles=(x.contact_roles||[]).map(r=>`<div class="kv"><span>${esc(((r.contact_first||'')+' '+(r.contact_last||'')).trim())}${r.is_primary?' ⭐':''}${r.contact_title?(' · '+esc(r.contact_title)):''}</span><span>${esc(r.role)}</span></div>`).join('')||'<div class="muted">No contacts</div>';
-    const acts=(x.activities||[]).map(a=>`<div class="ev ${a.is_closed?'done':''}"><div class="t2">${esc(a.subject)} <span class="chip">${esc(a.subtype)}</span> ${a.is_closed?'<span class="chip won">done</span>':'<span class="chip">open</span>'}</div><div class="m">${fdate(a.due_at)}</div></div>`).join('')||'<div class="muted">No activities logged</div>';
+    const acts=(x.activities||[]).map(a=>{ const od=!a.is_closed&&a.due_at&&a.due_at<Date.now(); return `<div class="ev ${a.is_closed?'done':(od?'overdue':'')}"><div class="t2">${esc(a.subject)} <span class="chip">${esc(a.subtype)}</span> ${a.is_closed?'<span class="chip won">done</span>':(od?'<span class="chip lost">overdue</span>':'<span class="chip">open</span>')}</div><div class="m">${a.is_closed?'Completed ':'Due '}${fdate(a.due_at)}</div></div>`; }).join('')||'<div class="muted">No activities logged</div>';
     const hist=(x.stage_history||[]).map(h=>{const to=STAGES.find(s=>s.id===h.to_stage_id);return `<div class="ev"><div class="t2">${to?esc(to.name):('Stage '+h.to_stage_id)} <span class="chip">${h.probability_snapshot}%</span></div><div class="m">${fdate(h.changed_at)} · ${h.days_in_previous_stage}d in prior stage</div></div>`;}).join('')||'<div class="muted">No history</div>';
+    const reasons=attnInfo(d,x.activities);
+    const banner=reasons?`<div class="attn-banner"><span style="width:16px;height:16px;color:var(--amber)">${icon('warn')}</span><div><span class="b">Needs attention</span> — ${reasons.join(', ')}. Log a call or task to keep it moving.</div><button class="brand sm" style="margin-left:auto" onclick="openLog()">Log activity</button></div>`:'';
     const ca=d.is_closed?'':`<div class="path-actions"><button class="brand sm" onclick="advance(${d.id})">Mark Stage Complete &rarr;</button><button class="sm neutral" style="color:var(--green)" onclick="won(${d.id})">Closed Won</button><button class="sm neutral" style="color:var(--red)" onclick="lost(${d.id})">Closed Lost</button></div>`;
     dr.innerHTML=`<div data-deal="${id}">
-      <div class="rechead"><div class="top"><div class="objicon" style="background:#fcb95b">💼</div>
+      <div class="rechead"><div class="top"><div class="objicon" style="background:#0176d3">${icon('briefcase')}</div>
         <div class="grow"><div class="t">Opportunity</div><div class="n">${esc(d.name)}</div><div class="muted" style="font-size:12px">${esc(x.account?x.account.name:'')} · Owner ${esc(x.owner?x.owner.name:'')}</div></div>
         <button class="sm neutral" onclick="closeDrawer()">Close</button></div>
         <div class="highlights">
@@ -415,7 +469,8 @@ async function openDeal(id){
           <div class="f"><div class="k">Forecast Category</div><div class="v">${esc(d.forecast_category)}</div></div>
           <div class="f"><div class="k">Status</div><div class="v ${d.is_won?'b-green':(d.status==='lost'?'b-red':'')}">${esc(d.status)}</div></div>
         </div></div>
-      <div class="path-wrap"><div class="path">${pathHtml(d)}</div>${ca}${d.lost_reason?('<div class="muted" style="margin-top:8px">Lost reason: '+esc(d.lost_reason)+'</div>'):''}</div>
+      ${banner}
+      <div class="path-wrap"><div class="path-label">Sales Path — click a stage to advance</div><div class="path">${pathHtml(d)}</div>${ca}${d.lost_reason?('<div class="muted" style="margin-top:8px">Lost reason: '+esc(d.lost_reason)+'</div>'):''}</div>
       <div class="recbody">
         <div class="sec"><div class="sh">Details</div><div class="sb">
           <div class="kv"><span>Next Step</span><span>${esc(d.next_step||'—')}</span></div>
@@ -423,7 +478,7 @@ async function openDeal(id){
           <div class="kv"><span>Lead Source</span><span>${esc(d.lead_source||'—')}</span></div>
           <div class="kv"><span>Last Activity</span><span>${fdate(d.last_activity_at)}</span></div></div></div>
         <div class="sec"><div class="sh">Contact Roles</div><div class="sb">${roles}</div></div>
-        <div class="sec"><div class="sh">Activity <button class="sm neutral" onclick="toggleLog()">Log</button></div><div class="sb">
+        <div class="sec"><div class="sh">Activity <button class="sm neutral" onclick="openLog()">+ Log</button></div><div class="sb">
           <div id="logform" class="hidden" style="margin-bottom:10px"><div class="grid2"><input id="actSubj" placeholder="Subject e.g. Discovery call" /><select id="actType"><option value="call">Call</option><option value="email">Email</option><option value="meeting">Meeting</option><option value="task">Task</option></select></div>
             <div class="row" style="margin-top:7px"><label style="margin:0"><input type="checkbox" id="actDone" style="width:auto" checked> completed</label><button class="brand sm grow" onclick="logActivity(${d.id})">Save</button></div></div>
           <div class="tl">${acts}</div></div></div>
@@ -431,16 +486,16 @@ async function openDeal(id){
       </div></div>`;
   }catch(e){ dr.innerHTML=`<div style="padding:24px" class="err">${esc(e.message)}</div>`; }
 }
-function toggleLog(){ document.getElementById('logform').classList.toggle('hidden'); }
-async function logActivity(id){ const subject=document.getElementById('actSubj').value.trim(); if(!subject)return; try{ await api(`${CRM}/deals/${id}/activities`,{method:'POST',body:JSON.stringify({deal_id:id,subject,subtype:document.getElementById('actType').value,completed:document.getElementById('actDone').checked})}); openDeal(id);}catch(e){ alert(e.message);} }
+function openLog(){ const f=document.getElementById('logform'); if(f){ f.classList.remove('hidden'); const s=document.getElementById('actSubj'); if(s)s.focus(); } }
+async function logActivity(id){ const subject=document.getElementById('actSubj').value.trim(); if(!subject)return; try{ await api(`${CRM}/deals/${id}/activities`,{method:'POST',body:JSON.stringify({deal_id:id,subject,subtype:document.getElementById('actType').value,completed:document.getElementById('actDone').checked})}); openDeal(id); if(!document.getElementById('v-board').classList.contains('hidden'))renderBoard(); if(!document.getElementById('v-dash').classList.contains('hidden'))renderDash(); }catch(e){ alert(e.message);} }
 
 /* ---------- LEADS ---------- */
 async function renderLeads(){
-  const el=document.getElementById('v-leads'); el.innerHTML=`<div class="objhead"><div class="objicon" style="background:#f88962">🎯</div><div><div class="t">Leads</div><div class="n">All Open Leads</div></div></div><div style="padding:18px 20px"><div class="muted">Loading…</div></div>`;
+  const el=document.getElementById('v-leads'); el.innerHTML=`<div class="objhead"><div class="objicon" style="background:#f88962">${icon('target')}</div><div><div class="t">Leads</div><div class="n">All Open Leads</div></div></div><div style="padding:18px 20px"><div class="muted">Loading…</div></div>`;
   try{
     const leads=await api(`${CRM}/leads`);
     const rows=leads.map(l=>`<tr><td><b style="color:var(--brand-dark)">${esc(l.first_name)} ${esc(l.last_name)}</b><div class="muted">${esc(l.email||'')}</div></td><td>${esc(l.company)}</td><td>${esc(l.lead_source||'')}</td><td><span class="chip">${esc(l.status)}</span></td><td>${esc(l.rating||'')}</td><td>${l.is_converted?'<span class="chip won">converted</span>':`<button class="sm brand" onclick="convertLead(${l.id})">Convert</button>`}</td></tr>`).join('');
-    el.innerHTML=`<div class="objhead"><div class="objicon" style="background:#f88962">🎯</div><div><div class="t">Leads</div><div class="n">All Open Leads</div></div></div><div style="padding:18px 20px"><div class="card"><table class="lead"><thead><tr><th>Name</th><th>Company</th><th>Source</th><th>Status</th><th>Rating</th><th></th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+    el.innerHTML=`<div class="objhead"><div class="objicon" style="background:#f88962">${icon('target')}</div><div><div class="t">Leads</div><div class="n">All Open Leads</div></div></div><div style="padding:18px 20px"><div class="card"><table class="lead"><thead><tr><th>Name</th><th>Company</th><th>Source</th><th>Status</th><th>Rating</th><th></th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
   }catch(e){ showErr('viewErr',e.message); }
 }
 async function convertLead(id){ if(!confirm('Convert this lead into an Account, Contact, and Opportunity?'))return; try{ const r=await api(`${CRM}/leads/${id}/convert`,{method:'POST',body:JSON.stringify({lead_id:id,create_opportunity:true,amount:25000})}); alert('Converted ✓  New opportunity #'+(r.opportunity_id||'—')+' on '+r.account.name); renderLeads(); }catch(e){ showErr('viewErr',e.message); } }

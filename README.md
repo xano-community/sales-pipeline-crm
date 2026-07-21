@@ -72,6 +72,7 @@ The pipeline itself is data, not code: a `pipeline_stage` table holds the ten st
 |---|---|---|
 | `GET` | `/dashboard/stats` | Forecast rollups, win rate, pipeline-by-stage, leaderboard. |
 | `GET` | `/forecast` | Per-rep quota attainment. |
+| `GET` | `/activity-feed` | Recent stage-change history across deals (dashboard feed). |
 
 **`api:salescrm-seed`** — demo data
 

@@ -1,0 +1,19 @@
+// Close a deal as Lost with a reason (thin wrapper over the lose_deal function).
+// Moves it to the is_lost stage, probability 0, forecast Omitted, and stamps
+// actual_close_date. Idempotent.
+query "deals/{deal_id}/lost" verb=POST {
+  api_group = "Crm"
+  description = "Mark a deal Lost with a reason (moves to the lost stage, probability 0, omitted)."
+  auth = "user"
+  input {
+    int deal_id { table = "deal" }
+    text lost_reason filters=trim
+  }
+  stack {
+    function.run "lose_deal" {
+      input = { deal_id: $input.deal_id, actor_id: $auth.id, actor_role: $auth.role, lost_reason: $input.lost_reason }
+    } as $final
+  }
+  response = $final
+  guid = "pl484nlL_kBzKXq9knGnkh0GtUo"
+}

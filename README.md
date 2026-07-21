@@ -99,6 +99,7 @@ The core deal logic lives in reusable functions (`create_deal`, `advance_deal`, 
 - **Unit tests** — embedded `test` blocks on the pure functions cover the math: expected-revenue, the cumulative forecast rollup, the quota color bands, the three Kanban alerts, and the day counter. Run with `xano unit_test run_all`.
 - **Workflow tests** (`backend/workflow_test/`) — end-to-end flows against the seeded data through the shared logic functions: the full deal lifecycle (create → advance → win, asserting the probability snapshot, forecast category, and that a stage-history row is written at each step), the forecast rollup plus lead conversion, and the rep stage-skip guardrail. Run with `xano workflow_test run_all`.
 - **Live smoke** — every published GET endpoint is checked reachable over HTTP after deploy.
+- **HTTP integration test** (`tests/api_smoke.py`) — a black-box Python script that hits every endpoint over real HTTP with real auth tokens (the layer the XanoScript tests can't reach), asserting authentication + negatives, manager/rep role scoping, the deal math, the stage-skip guard and cross-owner 403, won/lost effects, one-primary-contact enforcement, lead conversion, and the analytics response shapes. Run it after loading the seed: `python3 tests/api_smoke.py https://your-instance.xano.io`.
 
 All tests run unattended in a fresh workspace — this is a self-contained template, so no credentials are required.
 

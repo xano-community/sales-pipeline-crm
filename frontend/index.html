@@ -49,6 +49,7 @@
   .tabs { background:#fff; border-bottom:1px solid var(--border); padding:0 16px; display:flex; gap:2px; position:sticky; top:46px; z-index:20; }
   .tabs button { background:transparent; border:none; border-bottom:3px solid transparent; border-radius:0; color:var(--muted); padding:11px 16px; font-weight:600; display:flex; align-items:center; gap:7px; }
   .tabs button.active { color:var(--brand); border-bottom-color:var(--brand); }
+  .tabs button span { display:inline-flex; align-items:center; }
   .tabs button svg { width:15px; height:15px; }
 
   /* dashboard layout */
@@ -146,8 +147,8 @@
   .path-wrap { padding:14px 20px; background:#fff; border-bottom:1px solid var(--border); }
   .path-label { font-size:11px; color:var(--muted); margin-bottom:7px; }
   .path { display:flex; gap:3px; overflow-x:auto; }
-  .path .step { flex:1; min-width:104px; height:36px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; background:var(--path-idle); color:#514f4d; cursor:pointer; white-space:nowrap; clip-path:polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%, 15px 50%); padding-left:15px; }
-  .path .step:first-child { clip-path:polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%); padding-left:4px; }
+  .path .step { flex:0 0 auto; height:36px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:600; background:var(--path-idle); color:#514f4d; cursor:pointer; white-space:nowrap; clip-path:polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%, 15px 50%); padding:0 26px 0 34px; }
+  .path .step:first-child { clip-path:polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%); padding-left:16px; }
   .path .step.done { background:var(--path-done); color:#fff; }
   .path .step.current { background:var(--brand); color:#fff; }
   .path .step.won { background:var(--green); color:#fff; } .path .step.lost { background:var(--red); color:#fff; }
@@ -330,8 +331,6 @@ function dashHtml(){
     <h2>Q3 Pipeline Plan</h2><div class="sub">FY26 · In Progress</div>
     <div class="desc">Team deal pipeline for the current quarter — stage progression, weighted forecast, and quota attainment across the sales org.</div>
     <div class="shared"><div class="avstack">${shareInit}</div> Shared with ${reps.length}</div>
-    <div class="railsec">Scenario Elements <span class="muted">&rsaquo;</span></div>
-    <div class="railsec">Milestones <span class="muted">&rsaquo;</span></div>
     <div class="railsec" style="border-bottom:none">History</div>
     <div class="feed">${feed}</div></div>`;
   // kpis

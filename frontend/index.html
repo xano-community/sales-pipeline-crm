@@ -5,86 +5,132 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Sales Pipeline CRM — Xano</title>
 <style>
+  /* Salesforce Lightning–inspired styling (not affiliated with Salesforce). */
   :root {
-    --bg:#f4f6fb; --panel:#ffffff; --ink:#1a2233; --muted:#6b7688; --line:#e3e8f0;
-    --brand:#2f6df6; --brand-ink:#1b4fd0; --green:#1f9d55; --orange:#e08a00; --red:#d64545; --grey:#9aa4b2;
-    --shadow:0 1px 3px rgba(20,30,60,.08),0 6px 20px rgba(20,30,60,.06);
+    --navy:#03234d; --navy2:#0b2f61; --brand:#0176d3; --brand-dark:#014486;
+    --bg:#f3f3f3; --card:#ffffff; --border:#dddbda; --border2:#c9c7c5;
+    --ink:#181818; --muted:#706e6b; --green:#2e844a; --red:#ba0517; --amber:#dd7a01;
+    --path-idle:#ecebea; --path-done:#c9c7c5;
   }
   * { box-sizing:border-box; }
-  body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; background:var(--bg); color:var(--ink); }
+  body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; background:var(--bg); color:var(--ink); font-size:13px; }
   h1,h2,h3 { margin:0; }
-  button { font:inherit; cursor:pointer; border:none; border-radius:8px; padding:8px 14px; background:var(--brand); color:#fff; }
-  button.ghost { background:#eef2fb; color:var(--brand-ink); }
-  button.sm { padding:5px 9px; font-size:12px; }
+  button { font:inherit; cursor:pointer; border-radius:4px; padding:6px 14px; border:1px solid var(--border2); background:#fff; color:var(--brand); font-weight:600; }
+  button.brand { background:var(--brand); border-color:var(--brand); color:#fff; }
+  button.brand:hover { background:var(--brand-dark); }
+  button.neutral:hover { background:#f4f6f9; }
+  button.sm { padding:3px 9px; font-size:12px; }
   button:disabled { opacity:.5; cursor:default; }
-  input,select { font:inherit; padding:9px 11px; border:1px solid var(--line); border-radius:8px; width:100%; background:#fff; color:var(--ink); }
-  label { font-size:12px; color:var(--muted); display:block; margin:10px 0 4px; }
-  a { color:var(--brand-ink); }
+  input,select { font:inherit; padding:7px 10px; border:1px solid var(--border2); border-radius:4px; width:100%; background:#fff; color:var(--ink); }
+  input:focus,select:focus { outline:2px solid var(--brand); border-color:var(--brand); }
+  label { font-size:12px; color:var(--muted); display:block; margin:9px 0 3px; font-weight:600; }
+  a { color:var(--brand); }
   .center { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px; }
-  .card { background:var(--panel); border:1px solid var(--line); border-radius:14px; box-shadow:var(--shadow); }
-  .setup { width:400px; max-width:100%; padding:26px; }
-  .setup h1 { font-size:20px; margin-bottom:4px; }
-  .setup p { color:var(--muted); font-size:13px; margin:0 0 12px; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:8px; }
+  .setup { width:410px; max-width:100%; padding:26px; box-shadow:0 2px 10px rgba(0,0,0,.12); }
+  .setup h1 { font-size:20px; margin-bottom:4px; color:var(--navy); }
+  .setup p { color:var(--muted); font-size:12px; margin:0 0 12px; }
   .row { display:flex; gap:10px; align-items:center; }
   .grow { flex:1; }
-  /* top bar */
-  header { background:var(--panel); border-bottom:1px solid var(--line); padding:0 20px; display:flex; align-items:center; gap:18px; height:56px; position:sticky; top:0; z-index:10; }
-  header .logo { font-weight:700; font-size:15px; color:var(--brand-ink); }
-  header .logo span { color:var(--muted); font-weight:500; }
-  nav { display:flex; gap:4px; }
-  nav button { background:transparent; color:var(--muted); border-radius:8px; }
-  nav button.active { background:#eef2fb; color:var(--brand-ink); }
-  header .who { margin-left:auto; font-size:13px; color:var(--muted); display:flex; gap:10px; align-items:center; }
-  main { padding:20px; }
-  /* kanban */
-  .board { display:flex; gap:14px; overflow-x:auto; padding-bottom:12px; align-items:flex-start; }
-  .col { flex:0 0 268px; background:#eef1f7; border-radius:12px; padding:10px; }
-  .col h3 { font-size:12px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); display:flex; justify-content:space-between; margin-bottom:8px; }
-  .col .sum { font-size:11px; color:var(--muted); font-weight:600; }
-  .deal { background:#fff; border:1px solid var(--line); border-radius:10px; padding:10px; margin-bottom:9px; cursor:pointer; }
-  .deal:hover { border-color:var(--brand); }
-  .deal .nm { font-weight:600; font-size:13px; margin-bottom:3px; }
-  .deal .acct { font-size:12px; color:var(--muted); }
-  .deal .amt { font-size:13px; font-weight:700; margin-top:6px; }
-  .deal .er { font-size:11px; color:var(--muted); }
-  .deal .foot { display:flex; justify-content:space-between; align-items:center; margin-top:8px; gap:6px; }
-  .owner { font-size:11px; color:var(--muted); }
-  .alert { color:var(--orange); font-size:14px; cursor:help; }
-  .acts { display:flex; gap:5px; margin-top:8px; flex-wrap:wrap; }
-  .pill { font-size:10px; padding:2px 7px; border-radius:20px; background:#eef2fb; color:var(--brand-ink); }
-  .badge-won { background:#e5f6ec; color:var(--green); }
-  .badge-lost { background:#fbe9e9; color:var(--red); }
-  /* drawer */
-  .scrim { position:fixed; inset:0; background:rgba(15,22,40,.4); display:none; z-index:20; }
-  .scrim.open { display:block; }
-  .drawer { position:fixed; top:0; right:0; height:100%; width:460px; max-width:100%; background:#fff; box-shadow:-8px 0 30px rgba(20,30,60,.18); transform:translateX(100%); transition:transform .18s ease; overflow-y:auto; z-index:21; }
-  .drawer.open { transform:translateX(0); }
-  .drawer .dhead { padding:18px 20px; border-bottom:1px solid var(--line); position:sticky; top:0; background:#fff; }
-  .drawer .body { padding:18px 20px; }
-  .kv { display:flex; justify-content:space-between; font-size:13px; padding:5px 0; border-bottom:1px dashed var(--line); }
-  .kv span:first-child { color:var(--muted); }
-  .sec { font-size:12px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); margin:18px 0 8px; }
-  .tl { border-left:2px solid var(--line); padding-left:12px; margin-left:4px; }
-  .tl .ev { margin-bottom:11px; position:relative; }
-  .tl .ev::before { content:""; position:absolute; left:-17px; top:4px; width:8px; height:8px; border-radius:50%; background:var(--brand); }
-  .tl .ev .t { font-size:13px; font-weight:600; }
-  .tl .ev .m { font-size:12px; color:var(--muted); }
-  /* tables & dashboard */
-  table { width:100%; border-collapse:collapse; font-size:13px; }
-  th,td { text-align:left; padding:9px 8px; border-bottom:1px solid var(--line); }
-  th { font-size:11px; text-transform:uppercase; letter-spacing:.03em; color:var(--muted); }
-  .tiles { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px; margin-bottom:18px; }
-  .tile { padding:16px; }
-  .tile .lab { font-size:12px; color:var(--muted); }
-  .tile .val { font-size:24px; font-weight:700; margin-top:4px; }
-  .dot { display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:6px; }
-  .bar { height:9px; border-radius:6px; background:var(--brand); }
-  .bartrack { background:#eef1f7; border-radius:6px; overflow:hidden; }
-  .band-green { color:var(--green); } .band-orange { color:var(--orange); } .band-red { color:var(--red); } .band-grey { color:var(--grey); }
-  .bg-green { background:var(--green); } .bg-orange { background:var(--orange); } .bg-red { background:var(--red); } .bg-grey { background:var(--grey); }
-  .muted { color:var(--muted); font-size:12px; }
   .hidden { display:none; }
-  .err { background:#fbe9e9; color:var(--red); padding:9px 12px; border-radius:8px; font-size:13px; margin-bottom:10px; }
+  .err { background:#fdecea; color:var(--red); padding:9px 12px; border-radius:4px; font-size:12px; margin-bottom:10px; border-left:3px solid var(--red); }
+  .okmsg { background:#eef7ee; color:var(--green); padding:9px 12px; border-radius:4px; font-size:12px; margin-bottom:10px; border-left:3px solid var(--green); }
+
+  /* Lightning header */
+  header.nav { background:linear-gradient(180deg,var(--navy),var(--navy2)); color:#fff; padding:0 16px; position:sticky; top:0; z-index:30; }
+  .nav-top { display:flex; align-items:center; gap:14px; height:50px; }
+  .waffle { width:26px; height:26px; border-radius:5px; background:#fff; display:grid; grid-template-columns:repeat(3,1fr); grid-gap:2px; padding:4px; }
+  .waffle i { background:var(--brand); border-radius:1px; }
+  .appname { font-weight:700; font-size:15px; letter-spacing:.2px; }
+  .appname small { opacity:.7; font-weight:400; }
+  .search { margin-left:8px; flex:1; max-width:440px; }
+  .search input { background:#fff; border:none; border-radius:14px; height:30px; padding:6px 14px; font-size:12px; }
+  .nav-right { margin-left:auto; display:flex; align-items:center; gap:12px; }
+  .avatar { width:30px; height:30px; border-radius:50%; background:#1b96ff; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px; }
+  .nav-right .who { font-size:12px; opacity:.9; }
+  .nav-right button { background:transparent; border:1px solid rgba(255,255,255,.4); color:#fff; }
+  .nav-tabs { display:flex; gap:2px; height:40px; align-items:stretch; }
+  .nav-tabs button { background:transparent; border:none; color:#fff; opacity:.85; border-bottom:3px solid transparent; border-radius:0; padding:0 16px; font-weight:600; }
+  .nav-tabs button.active { opacity:1; border-bottom-color:#1b96ff; background:rgba(255,255,255,.06); }
+
+  /* object subheader */
+  .objhead { background:#fff; border-bottom:1px solid var(--border); padding:12px 20px; display:flex; align-items:center; gap:12px; }
+  .objicon { width:34px; height:34px; border-radius:6px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:17px; }
+  .objhead .t { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; }
+  .objhead .n { font-size:17px; font-weight:700; }
+  main { padding:18px 20px; }
+
+  /* Kanban */
+  .board { display:flex; gap:12px; overflow-x:auto; padding-bottom:10px; align-items:flex-start; }
+  .col { flex:0 0 250px; background:#ebeef1; border-radius:8px; }
+  .col .h { padding:9px 11px; border-bottom:2px solid var(--brand); border-radius:8px 8px 0 0; background:#fff; }
+  .col .h .nm { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.03em; color:#3e3e3c; }
+  .col .h .sum { font-size:11px; color:var(--muted); margin-top:2px; }
+  .col .body { padding:9px; min-height:40px; }
+  .deal { background:#fff; border:1px solid var(--border); border-radius:6px; padding:10px; margin-bottom:8px; cursor:pointer; box-shadow:0 1px 1px rgba(0,0,0,.04); }
+  .deal:hover { border-color:var(--brand); }
+  .deal .nm { font-weight:700; font-size:13px; color:var(--brand-dark); }
+  .deal .acct { font-size:12px; color:var(--muted); margin-top:1px; }
+  .deal .amt { font-size:14px; font-weight:700; margin-top:7px; }
+  .deal .er { font-size:11px; color:var(--muted); font-weight:400; }
+  .deal .foot { display:flex; justify-content:space-between; align-items:center; margin-top:8px; }
+  .chip { font-size:10px; padding:2px 8px; border-radius:11px; background:#eef4fb; color:var(--brand-dark); font-weight:600; }
+  .chip.won { background:#eef7ee; color:var(--green); } .chip.lost { background:#fdecea; color:var(--red); }
+  .alert { color:var(--amber); font-size:15px; cursor:help; }
+  .acts { display:flex; gap:5px; margin-top:8px; flex-wrap:wrap; }
+
+  /* record drawer as a Lightning record page */
+  .scrim { position:fixed; inset:0; background:rgba(3,20,40,.35); display:none; z-index:40; }
+  .scrim.open { display:block; }
+  .drawer { position:fixed; top:0; right:0; height:100%; width:720px; max-width:100%; background:var(--bg); box-shadow:-10px 0 30px rgba(0,0,0,.22); transform:translateX(100%); transition:transform .18s ease; overflow-y:auto; z-index:41; }
+  .drawer.open { transform:translateX(0); }
+  .rechead { background:#fff; border-bottom:1px solid var(--border); padding:14px 20px; position:sticky; top:0; z-index:2; }
+  .rechead .top { display:flex; align-items:flex-start; gap:12px; }
+  .rechead .t { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; }
+  .rechead .n { font-size:19px; font-weight:700; }
+  .highlights { display:flex; gap:26px; margin-top:12px; flex-wrap:wrap; }
+  .highlights .f .k { font-size:11px; color:var(--muted); }
+  .highlights .f .v { font-size:14px; font-weight:600; }
+
+  /* Sales Path */
+  .path-wrap { padding:14px 20px; background:#fff; border-bottom:1px solid var(--border); }
+  .path { display:flex; gap:3px; overflow-x:auto; }
+  .path .step { flex:1; min-width:104px; height:36px; display:flex; align-items:center; justify-content:center; gap:5px; font-size:11px; font-weight:600; background:var(--path-idle); color:#514f4d; cursor:pointer; white-space:nowrap; clip-path:polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%, 15px 50%); padding-left:15px; }
+  .path .step:first-child { clip-path:polygon(0 0, calc(100% - 15px) 0, 100% 50%, calc(100% - 15px) 100%, 0 100%); padding-left:4px; }
+  .path .step.done { background:var(--path-done); color:#fff; }
+  .path .step.current { background:var(--brand); color:#fff; }
+  .path .step.won { background:var(--green); color:#fff; }
+  .path .step.lost { background:var(--red); color:#fff; }
+  .path-actions { display:flex; gap:8px; margin-top:10px; }
+
+  .recbody { padding:16px 20px; display:grid; grid-template-columns:1fr 1fr; gap:16px; align-items:start; }
+  .sec { background:#fff; border:1px solid var(--border); border-radius:8px; }
+  .sec .sh { padding:10px 14px; border-bottom:1px solid var(--border); font-weight:700; font-size:13px; display:flex; justify-content:space-between; align-items:center; }
+  .sec .sb { padding:12px 14px; }
+  .kv { display:flex; justify-content:space-between; font-size:12px; padding:6px 0; border-bottom:1px solid #f0f0f0; gap:12px; }
+  .kv span:first-child { color:var(--muted); }
+  .tl { border-left:2px solid var(--border); padding-left:12px; margin-left:3px; }
+  .tl .ev { margin-bottom:11px; position:relative; }
+  .tl .ev::before { content:""; position:absolute; left:-17px; top:3px; width:9px; height:9px; border-radius:50%; background:var(--brand); border:2px solid #fff; }
+  .tl .ev.done::before { background:var(--green); }
+  .tl .ev .t2 { font-size:12px; font-weight:600; }
+  .tl .ev .m { font-size:11px; color:var(--muted); }
+
+  /* tables & dashboard */
+  table { width:100%; border-collapse:collapse; font-size:12px; }
+  th,td { text-align:left; padding:9px 10px; border-bottom:1px solid var(--border); }
+  th { font-size:11px; text-transform:uppercase; letter-spacing:.03em; color:var(--muted); background:#fafaf9; }
+  tr:hover td { background:#f8fbfe; }
+  .tiles { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:14px; margin-bottom:18px; }
+  .tile { padding:15px; }
+  .tile .lab { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.03em; }
+  .tile .val { font-size:23px; font-weight:700; margin-top:5px; }
+  .dot { display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:6px; }
+  .bartrack { background:#ebeef1; border-radius:5px; overflow:hidden; height:9px; }
+  .bar { height:9px; border-radius:5px; background:var(--brand); }
+  .band-green{color:var(--green)} .band-orange{color:var(--amber)} .band-red{color:var(--red)} .band-grey{color:var(--muted)}
+  .bg-green{background:var(--green)} .bg-orange{background:var(--amber)} .bg-red{background:var(--red)} .bg-grey{background:#b0adab}
+  .muted { color:var(--muted); font-size:11px; }
   .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 </style>
 </head>
@@ -94,47 +140,54 @@
 <div id="setup" class="center hidden">
   <div class="card setup">
     <h1>Sales Pipeline CRM</h1>
-    <p>A custom Salesforce-style deal pipeline on Xano. Enter your Xano instance base URL to begin.</p>
+    <p>A Salesforce-style deal pipeline on Xano. Enter your Xano instance base URL to begin.</p>
     <label>Instance base URL</label>
     <input id="baseUrl" placeholder="https://your-instance.xano.io" />
     <div style="height:14px"></div>
-    <button class="grow" style="width:100%" onclick="saveBase()">Continue</button>
+    <button class="brand" style="width:100%" onclick="saveBase()">Continue</button>
   </div>
 </div>
 
 <!-- LOGIN -->
 <div id="login" class="center hidden">
   <div class="card setup">
-    <h1>Sign in</h1>
-    <p>Demo users (password <b>DemoPass1</b>): morgan.lee@northwind.example (manager), alex.chen@northwind.example (rep).</p>
+    <h1>Log In</h1>
+    <p>Demo users (password <b>DemoPass1</b>): morgan.lee@northwind.example (manager) · alex.chen@northwind.example (rep).</p>
     <div id="loginErr"></div>
-    <label>Email</label>
+    <label>Username</label>
     <input id="email" value="morgan.lee@northwind.example" />
     <label>Password</label>
     <input id="password" type="password" value="DemoPass1" />
     <div style="height:14px"></div>
-    <button style="width:100%" onclick="doLogin()">Sign in</button>
-    <div style="height:10px"></div>
-    <button class="ghost" style="width:100%" onclick="loadDemo()">Load demo data</button>
-    <div style="height:10px"></div>
-    <button class="ghost sm" onclick="clearCfg()">Change instance URL</button>
+    <button class="brand" style="width:100%" onclick="doLogin()">Log In</button>
+    <div style="height:9px"></div>
+    <button class="neutral" style="width:100%" onclick="loadDemo()">Load demo data</button>
+    <div style="height:9px"></div>
+    <button class="sm neutral" onclick="clearCfg()">Change instance URL</button>
   </div>
 </div>
 
 <!-- APP -->
 <div id="app" class="hidden">
-  <header>
-    <div class="logo">Pipeline<span>CRM</span></div>
-    <nav>
-      <button data-view="board" class="active" onclick="go('board')">Pipeline</button>
+  <header class="nav">
+    <div class="nav-top">
+      <div class="waffle"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="appname">Pipeline <small>CRM</small></div>
+      <div class="search"><input placeholder="Search… (demo)" onkeydown="return false" /></div>
+      <div class="nav-right">
+        <span id="whoami" class="who"></span>
+        <div id="avatar" class="avatar"></div>
+        <button class="sm" onclick="logout()">Log Out</button>
+      </div>
+    </div>
+    <div class="nav-tabs">
+      <button data-view="board" class="active" onclick="go('board')">Opportunities</button>
       <button data-view="leads" onclick="go('leads')">Leads</button>
-      <button data-view="forecast" onclick="go('forecast')">Forecast</button>
-    </nav>
-    <div class="who">
-      <span id="whoami"></span>
-      <button class="ghost sm" onclick="logout()">Sign out</button>
+      <button data-view="forecast" onclick="go('forecast')">Forecasts</button>
     </div>
   </header>
+
+  <div id="objhead" class="objhead"></div>
   <main>
     <div id="viewErr"></div>
     <div id="v-board"></div>
@@ -143,7 +196,6 @@
   </main>
 </div>
 
-<!-- DRAWER -->
 <div id="scrim" class="scrim" onclick="closeDrawer()"></div>
 <div id="drawer" class="drawer"></div>
 
@@ -151,6 +203,12 @@
 const LS = { cfg:'salescrm:cfg', token:'salescrm:token', user:'salescrm:user' };
 let cfg = loadCfg();
 let STAGES = [];
+const AUTH='/api:salescrm-auth', CRM='/api:salescrm-crm', AN='/api:salescrm-analytics', SEED='/api:salescrm-seed';
+const OBJ = {
+  board:   { t:'Opportunities', n:'Pipeline Board', icon:'💼', color:'#fcb95b' },
+  leads:   { t:'Leads', n:'All Open Leads', icon:'🎯', color:'#f88962' },
+  forecast:{ t:'Forecasts', n:'Team Forecast', icon:'📊', color:'#8199af' },
+};
 
 function loadCfg(){ const r=localStorage.getItem(LS.cfg); return r?JSON.parse(r):{baseUrl:''}; }
 function getToken(){ return localStorage.getItem(LS.token); }
@@ -158,6 +216,8 @@ function getUser(){ const r=localStorage.getItem(LS.user); return r?JSON.parse(r
 function normalizeBase(u){ return (u||'').trim().replace(/\/+$/,''); }
 function money(n){ return '$'+Math.round(n||0).toLocaleString(); }
 function esc(s){ return (s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function initials(n){ return (n||'?').split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase(); }
+function fdate(ms){ return ms? new Date(ms).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}) : '—'; }
 
 window.clearCfg = function(){ localStorage.removeItem(LS.cfg); route(); };
 
@@ -168,28 +228,17 @@ async function api(path, opts={}){
   if (!res.ok) throw new Error((await res.text())||('HTTP '+res.status));
   return res.status===204 ? null : res.json();
 }
-const AUTH='/api:salescrm-auth', CRM='/api:salescrm-crm', AN='/api:salescrm-analytics', SEED='/api:salescrm-seed';
 
-function saveBase(){
-  const b = normalizeBase(document.getElementById('baseUrl').value);
-  if(!b) return;
-  cfg={baseUrl:b}; localStorage.setItem(LS.cfg, JSON.stringify(cfg)); route();
-}
-function showErr(id,msg){ document.getElementById(id).innerHTML = `<div class="err">${esc(msg)}</div>`; }
+function saveBase(){ const b=normalizeBase(document.getElementById('baseUrl').value); if(!b)return; cfg={baseUrl:b}; localStorage.setItem(LS.cfg,JSON.stringify(cfg)); route(); }
+function showErr(id,msg,ok){ document.getElementById(id).innerHTML = msg?`<div class="${ok?'okmsg':'err'}">${esc(msg)}</div>`:''; }
 
 async function doLogin(){
   try{
-    const r = await api(`${AUTH}/login`, {method:'POST', body:JSON.stringify({
-      email:document.getElementById('email').value, password:document.getElementById('password').value })});
-    localStorage.setItem(LS.token, r.authToken); localStorage.setItem(LS.user, JSON.stringify(r.user));
-    route();
-  }catch(e){ showErr('loginErr', 'Login failed: '+e.message); }
+    const r = await api(`${AUTH}/login`, {method:'POST', body:JSON.stringify({ email:document.getElementById('email').value, password:document.getElementById('password').value })});
+    localStorage.setItem(LS.token, r.authToken); localStorage.setItem(LS.user, JSON.stringify(r.user)); route();
+  }catch(e){ showErr('loginErr','Login failed: '+e.message); }
 }
-async function loadDemo(){
-  try{ await api(`${SEED}/seed`, {method:'POST', body:'{}'}); showErr('loginErr','');
-    document.getElementById('loginErr').innerHTML = '<div class="err" style="background:#e5f6ec;color:#1f9d55">Demo data loaded. Sign in above.</div>';
-  }catch(e){ showErr('loginErr','Seed failed: '+e.message); }
-}
+async function loadDemo(){ try{ await api(`${SEED}/seed`,{method:'POST',body:'{}'}); showErr('loginErr','Demo data loaded. Log in above.',true);}catch(e){ showErr('loginErr','Seed failed: '+e.message);} }
 function logout(){ localStorage.removeItem(LS.token); localStorage.removeItem(LS.user); route(); }
 
 function route(){
@@ -199,13 +248,17 @@ function route(){
   if(!cfg.baseUrl){ setup.classList.remove('hidden'); return; }
   if(!getToken()){ login.classList.remove('hidden'); return; }
   app.classList.remove('hidden');
-  const u=getUser(); document.getElementById('whoami').textContent = u ? `${u.name} · ${u.role}` : '';
+  const u=getUser();
+  document.getElementById('whoami').textContent = u ? `${u.name} · ${u.role}` : '';
+  document.getElementById('avatar').textContent = u ? initials(u.name) : '';
   go('board');
 }
 
 function go(view){
-  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active', b.dataset.view===view));
+  document.querySelectorAll('.nav-tabs button').forEach(b=>b.classList.toggle('active', b.dataset.view===view));
   ['board','leads','forecast'].forEach(v=>document.getElementById('v-'+v).classList.toggle('hidden', v!==view));
+  const o=OBJ[view];
+  document.getElementById('objhead').innerHTML = `<div class="objicon" style="background:${o.color}">${o.icon}</div><div><div class="t">${o.t}</div><div class="n">${o.n}</div></div>`;
   document.getElementById('viewErr').innerHTML='';
   if(view==='board') renderBoard();
   if(view==='leads') renderLeads();
@@ -214,165 +267,161 @@ function go(view){
 
 /* ---------- KANBAN ---------- */
 async function renderBoard(){
-  const el=document.getElementById('v-board');
-  el.innerHTML='<div class="muted">Loading pipeline…</div>';
+  const el=document.getElementById('v-board'); el.innerHTML='<div class="muted">Loading pipeline…</div>';
   try{
     const board = await api(`${CRM}/board`);
     STAGES = board.map(c=>c.stage);
-    const cols = board.map(c=>{
-      const sum = c.deals.reduce((a,d)=>a+(d.amount||0),0);
-      const cards = c.deals.map(d=>dealCard(d, c.stage)).join('') || '<div class="muted" style="padding:6px">No deals</div>';
-      return `<div class="col"><h3>${esc(c.stage.name)} <span class="sum">${c.deals.length} · ${money(sum)}</span></h3>${cards}</div>`;
-    }).join('');
-    el.innerHTML = `<div class="board">${cols}</div>`;
-  }catch(e){ showErr('viewErr', e.message); el.innerHTML=''; }
+    el.innerHTML = `<div class="board">${board.map(colHtml).join('')}</div>`;
+  }catch(e){ showErr('viewErr',e.message); el.innerHTML=''; }
 }
-function alertTitle(a){
-  const t=[]; if(a.overdue_task)t.push('Overdue task'); if(a.no_open_activities)t.push('No open activities'); if(a.no_activity_30_days)t.push('No activity for 30 days');
-  return t.join(' • ');
+function colHtml(c){
+  const sum=c.deals.reduce((a,d)=>a+(d.amount||0),0);
+  const cards=c.deals.map(d=>dealCard(d)).join('') || '<div class="muted" style="padding:6px">No opportunities</div>';
+  return `<div class="col"><div class="h"><div class="nm">${esc(c.stage.name)}</div><div class="sum">${c.deals.length} · ${money(sum)}</div></div><div class="body">${cards}</div></div>`;
 }
-function dealCard(d, stage){
-  const a=d.alerts||{}; const closed=d.is_closed;
-  const alert = (!closed && a.needs_attention) ? `<span class="alert" title="${esc(alertTitle(a))}">&#9888;</span>` : '';
+function alertTitle(a){ const t=[]; if(a.overdue_task)t.push('Overdue task'); if(a.no_open_activities)t.push('No open activities'); if(a.no_activity_30_days)t.push('No activity for 30 days'); return t.join(' • '); }
+function dealCard(d){
+  const a=d.alerts||{}, closed=d.is_closed;
+  const alert=(!closed && a.needs_attention)?`<span class="alert" title="${esc(alertTitle(a))}">&#9888;</span>`:'';
   let actions='';
   if(!closed){
-    actions = `<div class="acts">
-      <button class="sm ghost" onclick="event.stopPropagation();advance(${d.id})">Advance &rarr;</button>
-      <button class="sm" style="background:var(--green)" onclick="event.stopPropagation();won(${d.id})">Won</button>
-      <button class="sm" style="background:var(--red)" onclick="event.stopPropagation();lost(${d.id})">Lost</button>
-    </div>`;
-  } else {
-    actions = `<div class="acts"><span class="pill ${d.is_won?'badge-won':'badge-lost'}">${d.is_won?'Closed Won':'Closed Lost'}</span></div>`;
-  }
+    actions=`<div class="acts">
+      <button class="sm neutral" onclick="event.stopPropagation();advance(${d.id})">Advance &rarr;</button>
+      <button class="sm neutral" style="color:var(--green)" onclick="event.stopPropagation();won(${d.id})">Won</button>
+      <button class="sm neutral" style="color:var(--red)" onclick="event.stopPropagation();lost(${d.id})">Lost</button></div>`;
+  } else { actions=`<div class="acts"><span class="chip ${d.is_won?'won':'lost'}">${d.is_won?'Closed Won':'Closed Lost'}</span></div>`; }
   return `<div class="deal" onclick="openDeal(${d.id})">
-    <div class="row"><div class="grow"><div class="nm">${esc(d.name)}</div></div>${alert}</div>
-    <div class="amt">${money(d.amount)} <span class="er">· exp ${money(d.expected_revenue)} (${d.probability}%)</span></div>
-    <div class="foot"><span class="owner">#${d.owner_id}</span><span class="pill">${esc(d.forecast_category)}</span></div>
-    ${actions}
-  </div>`;
+    <div class="row"><div class="grow"><div class="nm">${esc(d.name)}</div><div class="acct">Acct #${d.account_id}</div></div>${alert}</div>
+    <div class="amt">${money(d.amount)} <span class="er">· ${money(d.expected_revenue)} exp (${d.probability}%)</span></div>
+    <div class="foot"><span class="chip">${esc(d.forecast_category)}</span><span class="muted">Owner #${d.owner_id}</span></div>
+    ${actions}</div>`;
 }
-async function advance(id){
+function nextStage(curSort){ return STAGES.filter(s=>!s.is_closed && s.sort_order>curSort).sort((a,b)=>a.sort_order-b.sort_order)[0]; }
+async function advance(id,toStageId){
   try{
-    const detail = await api(`${CRM}/deals/${id}`);
-    const curSort = detail.stage.sort_order;
-    const next = STAGES.filter(s=>!s.is_closed && s.sort_order>curSort).sort((a,b)=>a.sort_order-b.sort_order)[0];
-    if(!next){ alert('Already at the last open stage — use Won or Lost.'); return; }
-    await api(`${CRM}/deals/${id}/advance`, {method:'POST', body:JSON.stringify({deal_id:id, stage_id:next.id})});
+    let target=toStageId;
+    if(!target){ const d=await api(`${CRM}/deals/${id}`); const n=nextStage(d.stage.sort_order); if(!n){alert('Already at the last open stage — mark Won or Lost.');return;} target=n.id; }
+    await api(`${CRM}/deals/${id}/advance`,{method:'POST',body:JSON.stringify({deal_id:id,stage_id:target})});
+    if(document.getElementById('drawer').classList.contains('open')) openDeal(id);
     renderBoard();
-  }catch(e){ showErr('viewErr', e.message); }
+  }catch(e){ alert(e.message); }
 }
-async function won(id){
-  try{ await api(`${CRM}/deals/${id}/won`, {method:'POST', body:JSON.stringify({deal_id:id})}); renderBoard(); }
-  catch(e){ showErr('viewErr', e.message); }
-}
-async function lost(id){
-  const reason = prompt('Reason for losing this deal?'); if(reason===null) return;
-  try{ await api(`${CRM}/deals/${id}/lost`, {method:'POST', body:JSON.stringify({deal_id:id, lost_reason:reason||'No reason given'})}); renderBoard(); }
-  catch(e){ showErr('viewErr', e.message); }
-}
+async function won(id){ try{ await api(`${CRM}/deals/${id}/won`,{method:'POST',body:JSON.stringify({deal_id:id})}); if(document.getElementById('drawer').classList.contains('open'))openDeal(id); renderBoard(); }catch(e){ alert(e.message);} }
+async function lost(id){ const r=prompt('Reason for losing this opportunity?'); if(r===null)return; try{ await api(`${CRM}/deals/${id}/lost`,{method:'POST',body:JSON.stringify({deal_id:id,lost_reason:r||'No reason given'})}); if(document.getElementById('drawer').classList.contains('open'))openDeal(id); renderBoard(); }catch(e){ alert(e.message);} }
 
-/* ---------- DRAWER ---------- */
+/* ---------- RECORD PAGE (drawer) ---------- */
 function closeDrawer(){ document.getElementById('scrim').classList.remove('open'); document.getElementById('drawer').classList.remove('open'); }
+function pathHtml(deal){
+  const open=STAGES.filter(s=>!s.is_closed).sort((a,b)=>a.sort_order-b.sort_order);
+  const cur=STAGES.find(s=>s.id===deal.stage_id);
+  if(deal.is_closed){
+    const steps=open.map(s=>`<div class="step done">${esc(s.name)}</div>`).join('');
+    return steps+`<div class="step ${deal.is_won?'won':'lost'}">${deal.is_won?'Closed Won ✓':'Closed Lost ✕'}</div>`;
+  }
+  const curSort=cur?cur.sort_order:0;
+  return open.map(s=>{
+    const cls = s.id===deal.stage_id?'current': (s.sort_order<curSort?'done':'');
+    return `<div class="step ${cls}" title="Move to ${esc(s.name)}" onclick="advance(${deal.id},${s.id})">${esc(s.name)}</div>`;
+  }).join('');
+}
 async function openDeal(id){
   const dr=document.getElementById('drawer');
   document.getElementById('scrim').classList.add('open'); dr.classList.add('open');
-  dr.innerHTML='<div class="body muted">Loading…</div>';
+  if(!dr.innerHTML.includes('data-deal="'+id+'"')) dr.innerHTML='<div style="padding:24px" class="muted">Loading…</div>';
   try{
-    const x = await api(`${CRM}/deals/${id}`);
-    const d=x.deal;
-    const roles = (x.contact_roles||[]).map(r=>`<div class="kv"><span>${esc(r.contact_name)}${r.is_primary?' ★':''}</span><span>${esc(r.role)}</span></div>`).join('') || '<div class="muted">No contacts</div>';
-    const acts = (x.activities||[]).map(a=>`<div class="ev"><div class="t">${esc(a.subject)} <span class="pill">${esc(a.subtype)}</span> ${a.is_closed?'<span class="pill badge-won">done</span>':'<span class="pill">open</span>'}</div><div class="m">${a.due_at?new Date(a.due_at).toLocaleDateString():''}</div></div>`).join('') || '<div class="muted">No activities</div>';
-    const hist = (x.stage_history||[]).map(h=>{ const to=STAGES.find(s=>s.id===h.to_stage_id); return `<div class="ev"><div class="t">${to?esc(to.name):('Stage '+h.to_stage_id)} <span class="pill">${h.probability_snapshot}%</span></div><div class="m">${new Date(h.changed_at).toLocaleDateString()} · ${h.days_in_previous_stage}d in prior stage</div></div>`; }).join('') || '<div class="muted">No history</div>';
-    dr.innerHTML = `
-      <div class="dhead">
-        <div class="row"><h2 class="grow" style="font-size:17px">${esc(d.name)}</h2><button class="ghost sm" onclick="closeDrawer()">Close</button></div>
-        <div class="muted">${esc(x.account?x.account.name:'')} · owner ${esc(x.owner?x.owner.name:'')}</div>
-      </div>
-      <div class="body">
-        <div class="kv"><span>Amount</span><span>${money(d.amount)}</span></div>
-        <div class="kv"><span>Expected revenue</span><span>${money(d.expected_revenue)} (${d.probability}%)</span></div>
-        <div class="kv"><span>Stage</span><span>${esc(x.stage?x.stage.name:'')}</span></div>
-        <div class="kv"><span>Forecast category</span><span>${esc(d.forecast_category)}</span></div>
-        <div class="kv"><span>Status</span><span>${esc(d.status)}${d.lost_reason?(' — '+esc(d.lost_reason)):''}</span></div>
-        <div class="kv"><span>Next step</span><span>${esc(d.next_step||'—')}</span></div>
-
-        <div class="sec">Contact roles</div>${roles}
-        <div class="sec">Log activity</div>
-        <div class="grid2">
-          <input id="actSubj" placeholder="Subject (e.g. Discovery call)" />
-          <select id="actType"><option value="call">Call</option><option value="email">Email</option><option value="meeting">Meeting</option><option value="task">Task</option></select>
+    const x=await api(`${CRM}/deals/${id}`); const d=x.deal;
+    const roles=(x.contact_roles||[]).map(r=>`<div class="kv"><span>${esc(((r.contact_first||'')+' '+(r.contact_last||'')).trim())}${r.is_primary?' ⭐':''}${r.contact_title?(' · '+esc(r.contact_title)):''}</span><span>${esc(r.role)}</span></div>`).join('')||'<div class="muted">No contacts</div>';
+    const acts=(x.activities||[]).map(a=>`<div class="ev ${a.is_closed?'done':''}"><div class="t2">${esc(a.subject)} <span class="chip">${esc(a.subtype)}</span> ${a.is_closed?'<span class="chip won">done</span>':'<span class="chip">open</span>'}</div><div class="m">${fdate(a.due_at)}</div></div>`).join('')||'<div class="muted">No activities logged</div>';
+    const hist=(x.stage_history||[]).map(h=>{const to=STAGES.find(s=>s.id===h.to_stage_id);return `<div class="ev"><div class="t2">${to?esc(to.name):('Stage '+h.to_stage_id)} <span class="chip">${h.probability_snapshot}%</span></div><div class="m">${fdate(h.changed_at)} · ${h.days_in_previous_stage}d in prior stage</div></div>`;}).join('')||'<div class="muted">No history</div>';
+    const closeActions = d.is_closed ? '' : `<div class="path-actions"><button class="brand sm" onclick="advance(${d.id})">Mark Stage Complete &rarr;</button><button class="sm neutral" style="color:var(--green)" onclick="won(${d.id})">Closed Won</button><button class="sm neutral" style="color:var(--red)" onclick="lost(${d.id})">Closed Lost</button></div>`;
+    dr.innerHTML = `<div data-deal="${id}">
+      <div class="rechead">
+        <div class="top"><div class="objicon" style="background:#fcb95b">💼</div>
+          <div class="grow"><div class="t">Opportunity</div><div class="n">${esc(d.name)}</div>
+            <div class="muted" style="font-size:12px">${esc(x.account?x.account.name:'')} · Owner ${esc(x.owner?x.owner.name:'')}</div></div>
+          <button class="sm neutral" onclick="closeDrawer()">Close</button></div>
+        <div class="highlights">
+          <div class="f"><div class="k">Amount</div><div class="v">${money(d.amount)}</div></div>
+          <div class="f"><div class="k">Expected Revenue</div><div class="v">${money(d.expected_revenue)} <span class="muted">(${d.probability}%)</span></div></div>
+          <div class="f"><div class="k">Close Date</div><div class="v">${fdate(d.close_date)}</div></div>
+          <div class="f"><div class="k">Forecast Category</div><div class="v">${esc(d.forecast_category)}</div></div>
+          <div class="f"><div class="k">Status</div><div class="v ${d.is_won?'band-green':(d.status==='lost'?'band-red':'')}">${esc(d.status)}</div></div>
         </div>
-        <div style="height:8px"></div>
-        <div class="row"><label style="margin:0"><input type="checkbox" id="actDone" style="width:auto" checked> completed</label>
-          <button class="sm grow" onclick="logActivity(${d.id})">Add activity</button></div>
-
-        <div class="sec">Activity timeline</div><div class="tl">${acts}</div>
-        <div class="sec">Stage history</div><div class="tl">${hist}</div>
-      </div>`;
-  }catch(e){ dr.innerHTML=`<div class="body err">${esc(e.message)}</div>`; }
+      </div>
+      <div class="path-wrap"><div class="path">${pathHtml(d)}</div>${closeActions}${d.lost_reason?('<div class="muted" style="margin-top:8px">Lost reason: '+esc(d.lost_reason)+'</div>'):''}</div>
+      <div class="recbody">
+        <div class="sec"><div class="sh">Details</div><div class="sb">
+          <div class="kv"><span>Next Step</span><span>${esc(d.next_step||'—')}</span></div>
+          <div class="kv"><span>Type</span><span>${esc(d.type||'—')}</span></div>
+          <div class="kv"><span>Lead Source</span><span>${esc(d.lead_source||'—')}</span></div>
+          <div class="kv"><span>Last Activity</span><span>${fdate(d.last_activity_at)}</span></div>
+        </div></div>
+        <div class="sec"><div class="sh">Contact Roles</div><div class="sb">${roles}</div></div>
+        <div class="sec"><div class="sh">Activity <button class="sm neutral" onclick="toggleLog()">Log</button></div><div class="sb">
+          <div id="logform" class="hidden" style="margin-bottom:10px">
+            <div class="grid2"><input id="actSubj" placeholder="Subject e.g. Discovery call" />
+              <select id="actType"><option value="call">Call</option><option value="email">Email</option><option value="meeting">Meeting</option><option value="task">Task</option></select></div>
+            <div class="row" style="margin-top:7px"><label style="margin:0"><input type="checkbox" id="actDone" style="width:auto" checked> completed</label>
+              <button class="brand sm grow" onclick="logActivity(${d.id})">Save</button></div>
+          </div>
+          <div class="tl">${acts}</div>
+        </div></div>
+        <div class="sec"><div class="sh">Stage History</div><div class="sb"><div class="tl">${hist}</div></div></div>
+      </div></div>`;
+  }catch(e){ dr.innerHTML=`<div style="padding:24px" class="err">${esc(e.message)}</div>`; }
 }
+function toggleLog(){ document.getElementById('logform').classList.toggle('hidden'); }
 async function logActivity(id){
-  const subject=document.getElementById('actSubj').value.trim(); if(!subject) return;
-  const subtype=document.getElementById('actType').value; const completed=document.getElementById('actDone').checked;
-  try{ await api(`${CRM}/deals/${id}/activities`, {method:'POST', body:JSON.stringify({deal_id:id, subject, subtype, completed})}); openDeal(id); }
-  catch(e){ alert(e.message); }
-}
+  const subject=document.getElementById('actSubj').value.trim(); if(!subject)return;
+  try{ await api(`${CRM}/deals/${id}/activities`,{method:'POST',body:JSON.stringify({deal_id:id,subject,subtype:document.getElementById('actType').value,completed:document.getElementById('actDone').checked})}); openDeal(id);}catch(e){ alert(e.message);} }
 
 /* ---------- LEADS ---------- */
 async function renderLeads(){
   const el=document.getElementById('v-leads'); el.innerHTML='<div class="muted">Loading leads…</div>';
   try{
-    const leads = await api(`${CRM}/leads`);
-    const rows = leads.map(l=>`<tr>
-      <td><b>${esc(l.first_name)} ${esc(l.last_name)}</b><div class="muted">${esc(l.email||'')}</div></td>
+    const leads=await api(`${CRM}/leads`);
+    const rows=leads.map(l=>`<tr>
+      <td><b style="color:var(--brand-dark)">${esc(l.first_name)} ${esc(l.last_name)}</b><div class="muted">${esc(l.email||'')}</div></td>
       <td>${esc(l.company)}</td><td>${esc(l.lead_source||'')}</td>
-      <td><span class="pill">${esc(l.status)}</span></td>
-      <td>${l.is_converted?'<span class="pill badge-won">converted</span>':`<button class="sm" onclick="convertLead(${l.id})">Convert</button>`}</td>
-    </tr>`).join('');
-    el.innerHTML = `<div class="card" style="padding:6px 16px 16px"><h2 style="font-size:16px;margin:14px 4px">Leads</h2>
-      <table><thead><tr><th>Name</th><th>Company</th><th>Source</th><th>Status</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`;
-  }catch(e){ showErr('viewErr', e.message); el.innerHTML=''; }
+      <td><span class="chip">${esc(l.status)}</span></td><td>${esc(l.rating||'')}</td>
+      <td>${l.is_converted?'<span class="chip won">converted</span>':`<button class="sm brand" onclick="convertLead(${l.id})">Convert</button>`}</td></tr>`).join('');
+    el.innerHTML=`<div class="card"><table><thead><tr><th>Name</th><th>Company</th><th>Source</th><th>Status</th><th>Rating</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  }catch(e){ showErr('viewErr',e.message); el.innerHTML=''; }
 }
 async function convertLead(id){
-  if(!confirm('Convert this lead into an account, contact, and opportunity?')) return;
-  try{
-    const r = await api(`${CRM}/leads/${id}/convert`, {method:'POST', body:JSON.stringify({lead_id:id, create_opportunity:true, amount:25000})});
-    alert('Converted! New opportunity #'+(r.opportunity_id||'—')+' on account '+r.account.name);
-    renderLeads();
-  }catch(e){ showErr('viewErr', e.message); }
+  if(!confirm('Convert this lead into an Account, Contact, and Opportunity?'))return;
+  try{ const r=await api(`${CRM}/leads/${id}/convert`,{method:'POST',body:JSON.stringify({lead_id:id,create_opportunity:true,amount:25000})});
+    alert('Converted ✓  New opportunity #'+(r.opportunity_id||'—')+' on '+r.account.name); renderLeads();
+  }catch(e){ showErr('viewErr',e.message); }
 }
 
 /* ---------- FORECAST ---------- */
 async function renderForecast(){
   const el=document.getElementById('v-forecast'); el.innerHTML='<div class="muted">Loading forecast…</div>';
   try{
-    const s = await api(`${AN}/dashboard/stats`);
-    const f = s.forecast;
-    const maxStage = Math.max(1, ...s.pipeline_by_stage.map(r=>r.amount));
-    const bars = s.pipeline_by_stage.map(r=>`<tr><td>${esc(r.stage_name)}</td><td>${r.count}</td><td>${money(r.amount)}</td>
-      <td style="width:40%"><div class="bartrack"><div class="bar" style="width:${Math.round(r.amount/maxStage*100)}%"></div></div></td></tr>`).join('');
-    const lead = s.leaderboard.map(r=>`<tr><td>${esc(r.name)}</td><td>${money(r.won_amount)}</td><td>${money(r.quota)}</td>
-      <td><span class="dot bg-${r.band}"></span><span class="band-${r.band}">${r.attainment_pct}%</span></td></tr>`).join('');
-    el.innerHTML = `
+    const s=await api(`${AN}/dashboard/stats`); const f=s.forecast;
+    const maxStage=Math.max(1,...s.pipeline_by_stage.map(r=>r.amount));
+    const bars=s.pipeline_by_stage.map(r=>`<tr><td>${esc(r.stage_name)}</td><td>${r.count}</td><td>${money(r.amount)}</td><td style="width:42%"><div class="bartrack"><div class="bar" style="width:${Math.round(r.amount/maxStage*100)}%"></div></div></td></tr>`).join('');
+    const lead=s.leaderboard.map(r=>`<tr><td>${esc(r.name)}</td><td>${money(r.won_amount)}</td><td>${money(r.quota)}</td><td><span class="dot bg-${r.band}"></span><span class="band-${r.band}" style="font-weight:700">${r.attainment_pct}%</span></td></tr>`).join('');
+    el.innerHTML=`
       <div class="tiles">
-        <div class="card tile"><div class="lab">Open pipeline (Pipeline+Best+Commit)</div><div class="val">${money(f.open_pipeline)}</div></div>
-        <div class="card tile"><div class="lab">Commit forecast</div><div class="val">${money(f.commit_forecast)}</div></div>
-        <div class="card tile"><div class="lab">Closed won</div><div class="val band-green">${money(f.closed_only)}</div></div>
-        <div class="card tile"><div class="lab">Weighted expected (open)</div><div class="val">${money(f.weighted_expected)}</div></div>
-        <div class="card tile"><div class="lab">Win rate</div><div class="val">${s.win_rate}%</div><div class="muted">${s.won_count} won · ${s.lost_count} lost</div></div>
-        <div class="card tile"><div class="lab">Deals needing attention</div><div class="val band-orange">${s.stale_deals}</div><div class="muted">no activity 30+ days</div></div>
+        <div class="card tile"><div class="lab">Open Pipeline</div><div class="val">${money(f.open_pipeline)}</div><div class="muted">Pipeline + Best Case + Commit</div></div>
+        <div class="card tile"><div class="lab">Commit Forecast</div><div class="val">${money(f.commit_forecast)}</div><div class="muted">Commit + Closed</div></div>
+        <div class="card tile"><div class="lab">Closed Won</div><div class="val band-green">${money(f.closed_only)}</div></div>
+        <div class="card tile"><div class="lab">Weighted Expected</div><div class="val">${money(f.weighted_expected)}</div><div class="muted">open deals · Amount×Probability</div></div>
+        <div class="card tile"><div class="lab">Win Rate</div><div class="val">${s.win_rate}%</div><div class="muted">${s.won_count} won · ${s.lost_count} lost</div></div>
+        <div class="card tile"><div class="lab">Needs Attention</div><div class="val band-orange">${s.stale_deals}</div><div class="muted">no activity 30+ days</div></div>
       </div>
       <div class="grid2" style="align-items:start">
-        <div class="card" style="padding:6px 16px 16px"><h2 style="font-size:15px;margin:14px 4px">Pipeline by stage</h2>
+        <div class="card"><div class="sh" style="padding:11px 14px;border-bottom:1px solid var(--border);font-weight:700">Pipeline by Stage</div>
           <table><thead><tr><th>Stage</th><th>#</th><th>Amount</th><th></th></tr></thead><tbody>${bars}</tbody></table></div>
-        <div class="card" style="padding:6px 16px 16px"><h2 style="font-size:15px;margin:14px 4px">Quota attainment</h2>
+        <div class="card"><div class="sh" style="padding:11px 14px;border-bottom:1px solid var(--border);font-weight:700">Quota Attainment</div>
           <table><thead><tr><th>Rep</th><th>Won</th><th>Quota</th><th>Attainment</th></tr></thead><tbody>${lead}</tbody></table></div>
       </div>
-      <p class="muted" style="margin-top:14px">Cumulative forecast columns and forecast categories follow Salesforce's documented model. Category rollups are unweighted; “weighted expected” is the probability-weighted ExpectedRevenue (Amount × Probability) over open deals.</p>`;
-  }catch(e){ showErr('viewErr', e.message); el.innerHTML=''; }
+      <p class="muted" style="margin-top:14px">Cumulative forecast columns and forecast categories follow Salesforce's documented model. Category rollups are unweighted; “weighted expected” is the probability-weighted ExpectedRevenue over open deals.</p>`;
+  }catch(e){ showErr('viewErr',e.message); el.innerHTML=''; }
 }
 
-/* boot */
 document.getElementById('baseUrl').value = cfg.baseUrl || '';
 route();
 </script>

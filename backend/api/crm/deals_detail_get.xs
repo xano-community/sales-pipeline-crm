@@ -34,7 +34,8 @@ query "deals/{deal_id}" verb=GET {
         contact: { table: "contact", where: $db.opportunity_contact_role.contact_id == $db.contact.id }
       }
       eval = {
-        contact_name: $db.contact.first_name ~ " " ~ $db.contact.last_name,
+        contact_first: $db.contact.first_name,
+        contact_last: $db.contact.last_name,
         contact_title: $db.contact.title
       }
     } as $roles

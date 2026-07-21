@@ -985,7 +985,11 @@ query "dashboard/stats" verb=GET {
   auth = "user"
   input {}
   stack {
-    var $is_mgr { value = ($auth.role == "manager") }
+    db.get "user" {
+      field_name = "id"
+      field_value = $auth.id
+    } as $me
+    var $is_mgr { value = ($me.role == "manager") }
     db.query "deal" {
       where = $is_mgr == true || $db.deal.owner_id == $auth.id
     } as $deals
@@ -1102,7 +1106,11 @@ query "forecast" verb=GET {
   auth = "user"
   input {}
   stack {
-    var $is_mgr { value = ($auth.role == "manager") }
+    db.get "user" {
+      field_name = "id"
+      field_value = $auth.id
+    } as $me
+    var $is_mgr { value = ($me.role == "manager") }
     db.query "user" {
       sort = { name: "asc" }
     } as $users
@@ -1273,7 +1281,11 @@ query "accounts" verb=GET {
   auth = "user"
   input {}
   stack {
-    var $is_mgr { value = ($auth.role == "manager") }
+    db.get "user" {
+      field_name = "id"
+      field_value = $auth.id
+    } as $me
+    var $is_mgr { value = ($me.role == "manager") }
     db.query "account" {
       where = $is_mgr == true || $db.account.owner_id == $auth.id
       sort = { name: "asc" }
@@ -1413,7 +1425,11 @@ query "board" verb=GET {
   auth = "user"
   input {}
   stack {
-    var $is_mgr { value = ($auth.role == "manager") }
+    db.get "user" {
+      field_name = "id"
+      field_value = $auth.id
+    } as $me
+    var $is_mgr { value = ($me.role == "manager") }
     db.query "pipeline_stage" {
       sort = { sort_order: "asc" }
     } as $stages
@@ -1595,12 +1611,16 @@ query "deals/{deal_id}/advance" verb=POST {
     int probability?
   }
   stack {
+    db.get "user" {
+      field_name = "id"
+      field_value = $auth.id
+    } as $me
     function.run "advance_deal" {
       input = {
         deal_id: $input.deal_id,
         target_stage_id: $input.stage_id,
         actor_id: $auth.id,
-        actor_role: $auth.role,
+        actor_role: $me.role,
         probability: $input.probability
       }
     } as $updated
@@ -1680,7 +1700,11 @@ query "deals" verb=GET {
     text status? filters=trim|lower
   }
   stack {
-    var $is_mgr { value = ($auth.role == "manager") }
+    db.get "user" {
+      field_name = "id"
+      field_value = $auth.id
+    } as $me
+    var $is_mgr { value = ($me.role == "manager") }
     db.query "deal" {
       where = ($is_mgr == true || $db.deal.owner_id == $auth.id) && $db.deal.stage_id ==? $input.stage_id && $db.deal.status ==? $input.status
       sort = { updated_at: "desc" }
@@ -1702,8 +1726,12 @@ query "deals/{deal_id}/lost" verb=POST {
     text lost_reason filters=trim
   }
   stack {
+    db.get "user" {
+      field_name = "id"
+      field_value = $auth.id
+    } as $me
     function.run "lose_deal" {
-      input = { deal_id: $input.deal_id, actor_id: $auth.id, actor_role: $auth.role, lost_reason: $input.lost_reason }
+      input = { deal_id: $input.deal_id, actor_id: $auth.id, actor_role: $me.role, lost_reason: $input.lost_reason }
     } as $final
   }
   response = $final
@@ -1759,8 +1787,12 @@ query "deals/{deal_id}/won" verb=POST {
     int deal_id { table = "deal" }
   }
   stack {
+    db.get "user" {
+      field_name = "id"
+      field_value = $auth.id
+    } as $me
     function.run "win_deal" {
-      input = { deal_id: $input.deal_id, actor_id: $auth.id, actor_role: $auth.role }
+      input = { deal_id: $input.deal_id, actor_id: $auth.id, actor_role: $me.role }
     } as $final
   }
   response = $final
@@ -2089,19 +2121,19 @@ query "seed" verb=POST {
         conditional {
           if ($existing_deal == null) {
             var $er { value = ($d.amount * $stage.default_probability / 100)|round:2 }
-            var $created { value = (now|to_int) - ($d.created_days * 86400000) }
-            var $last_act { value = ($d.activity_days == null ? null : (now|to_int) - ($d.activity_days * 86400000)) }
+            var $created { value = (now|transform_timestamp:("-" ~ $d.created_days ~ " days")) }
+            var $last_act { value = ($d.activity_days == null ? null : (now|transform_timestamp:("-" ~ $d.activity_days ~ " days"))) }
             var $acd { value = null }
             conditional {
               if ($d.status != "open") {
-                var.update $acd { value = (now|to_int) - 259200000 }
+                var.update $acd { value = (now|transform_timestamp:"-3 days") }
               }
             }
             db.add "deal" {
               data = {
                 name: $d.name, account_id: $acct.id, owner_id: $owner.id, amount: $d.amount,
                 probability: $stage.default_probability, expected_revenue: $er, stage_id: $stage.id,
-                forecast_category: $stage.forecast_category, close_date: ((now|to_int) + 1728000000),
+                forecast_category: $stage.forecast_category, close_date: (now|transform_timestamp:"+20 days"),
                 actual_close_date: $acd, status: $d.status, is_closed: $stage.is_closed, is_won: $stage.is_won,
                 lost_reason: $d.lost_reason, next_step: $d.next_step, type: "new_business",
                 last_activity_at: $last_act, created_at: $created, updated_at: now
@@ -2149,7 +2181,7 @@ query "seed" verb=POST {
             db.add "activity" {
               data = {
                 deal_id: $deal.id, owner_id: $deal.owner_id, kind: $kind, subtype: $act.subtype,
-                subject: $act.subject, due_at: ((now|to_int) + ($act.due_days * 86400000)),
+                subject: $act.subject, due_at: (now|transform_timestamp:($act.due_days ~ " days")),
                 status: $status, is_closed: $act.completed
               }
             }

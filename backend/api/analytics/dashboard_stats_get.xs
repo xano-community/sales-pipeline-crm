@@ -8,7 +8,11 @@ query "dashboard/stats" verb=GET {
   auth = "user"
   input {}
   stack {
-    var $is_mgr { value = ($auth.role == "manager") }
+    db.get "user" {
+      field_name = "id"
+      field_value = $auth.id
+    } as $me
+    var $is_mgr { value = ($me.role == "manager") }
     db.query "deal" {
       where = $is_mgr == true || $db.deal.owner_id == $auth.id
     } as $deals

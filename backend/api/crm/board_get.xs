@@ -7,7 +7,11 @@ query "board" verb=GET {
   auth = "user"
   input {}
   stack {
-    var $is_mgr { value = ($auth.role == "manager") }
+    db.get "user" {
+      field_name = "id"
+      field_value = $auth.id
+    } as $me
+    var $is_mgr { value = ($me.role == "manager") }
     db.query "pipeline_stage" {
       sort = { sort_order: "asc" }
     } as $stages

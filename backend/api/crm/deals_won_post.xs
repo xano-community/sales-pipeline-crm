@@ -9,8 +9,12 @@ query "deals/{deal_id}/won" verb=POST {
     int deal_id { table = "deal" }
   }
   stack {
+    db.get "user" {
+      field_name = "id"
+      field_value = $auth.id
+    } as $me
     function.run "win_deal" {
-      input = { deal_id: $input.deal_id, actor_id: $auth.id, actor_role: $auth.role }
+      input = { deal_id: $input.deal_id, actor_id: $auth.id, actor_role: $me.role }
     } as $final
   }
   response = $final

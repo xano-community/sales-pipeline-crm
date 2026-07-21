@@ -10,8 +10,12 @@ query "deals/{deal_id}/lost" verb=POST {
     text lost_reason filters=trim
   }
   stack {
+    db.get "user" {
+      field_name = "id"
+      field_value = $auth.id
+    } as $me
     function.run "lose_deal" {
-      input = { deal_id: $input.deal_id, actor_id: $auth.id, actor_role: $auth.role, lost_reason: $input.lost_reason }
+      input = { deal_id: $input.deal_id, actor_id: $auth.id, actor_role: $me.role, lost_reason: $input.lost_reason }
     } as $final
   }
   response = $final

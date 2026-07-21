@@ -206,19 +206,19 @@ query "seed" verb=POST {
         conditional {
           if ($existing_deal == null) {
             var $er { value = ($d.amount * $stage.default_probability / 100)|round:2 }
-            var $created { value = (now|to_int) - ($d.created_days * 86400000) }
-            var $last_act { value = ($d.activity_days == null ? null : (now|to_int) - ($d.activity_days * 86400000)) }
+            var $created { value = (now|transform_timestamp:("-" ~ $d.created_days ~ " days")) }
+            var $last_act { value = ($d.activity_days == null ? null : (now|transform_timestamp:("-" ~ $d.activity_days ~ " days"))) }
             var $acd { value = null }
             conditional {
               if ($d.status != "open") {
-                var.update $acd { value = (now|to_int) - 259200000 }
+                var.update $acd { value = (now|transform_timestamp:"-3 days") }
               }
             }
             db.add "deal" {
               data = {
                 name: $d.name, account_id: $acct.id, owner_id: $owner.id, amount: $d.amount,
                 probability: $stage.default_probability, expected_revenue: $er, stage_id: $stage.id,
-                forecast_category: $stage.forecast_category, close_date: ((now|to_int) + 1728000000),
+                forecast_category: $stage.forecast_category, close_date: (now|transform_timestamp:"+20 days"),
                 actual_close_date: $acd, status: $d.status, is_closed: $stage.is_closed, is_won: $stage.is_won,
                 lost_reason: $d.lost_reason, next_step: $d.next_step, type: "new_business",
                 last_activity_at: $last_act, created_at: $created, updated_at: now
@@ -266,7 +266,7 @@ query "seed" verb=POST {
             db.add "activity" {
               data = {
                 deal_id: $deal.id, owner_id: $deal.owner_id, kind: $kind, subtype: $act.subtype,
-                subject: $act.subject, due_at: ((now|to_int) + ($act.due_days * 86400000)),
+                subject: $act.subject, due_at: (now|transform_timestamp:($act.due_days ~ " days")),
                 status: $status, is_closed: $act.completed
               }
             }

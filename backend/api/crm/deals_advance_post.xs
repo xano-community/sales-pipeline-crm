@@ -13,12 +13,16 @@ query "deals/{deal_id}/advance" verb=POST {
     int probability?
   }
   stack {
+    db.get "user" {
+      field_name = "id"
+      field_value = $auth.id
+    } as $me
     function.run "advance_deal" {
       input = {
         deal_id: $input.deal_id,
         target_stage_id: $input.stage_id,
         actor_id: $auth.id,
-        actor_role: $auth.role,
+        actor_role: $me.role,
         probability: $input.probability
       }
     } as $updated

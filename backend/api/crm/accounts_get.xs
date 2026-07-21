@@ -5,7 +5,11 @@ query "accounts" verb=GET {
   auth = "user"
   input {}
   stack {
-    var $is_mgr { value = ($auth.role == "manager") }
+    db.get "user" {
+      field_name = "id"
+      field_value = $auth.id
+    } as $me
+    var $is_mgr { value = ($me.role == "manager") }
     db.query "account" {
       where = $is_mgr == true || $db.account.owner_id == $auth.id
       sort = { name: "asc" }

@@ -8,7 +8,11 @@ query "deals" verb=GET {
     text status? filters=trim|lower
   }
   stack {
-    var $is_mgr { value = ($auth.role == "manager") }
+    db.get "user" {
+      field_name = "id"
+      field_value = $auth.id
+    } as $me
+    var $is_mgr { value = ($me.role == "manager") }
     db.query "deal" {
       where = ($is_mgr == true || $db.deal.owner_id == $auth.id) && $db.deal.stage_id ==? $input.stage_id && $db.deal.status ==? $input.status
       sort = { updated_at: "desc" }

@@ -1,7 +1,7 @@
 // Salesforce Opportunity.ExpectedRevenue = Amount * Probability.
 // Ref: developer.salesforce.com Object Reference - Opportunity ("Read-only field
 // that is equal to the product of the opportunity Amount field and the Probability").
-function "calc_expected_revenue" {
+function "calc/calc_expected_revenue" {
   description = "Weighted expected revenue for a deal: amount * probability / 100 (Salesforce ExpectedRevenue)."
   input {
     decimal amount

@@ -75,7 +75,7 @@ query "forecast" verb=GET {
                   description = "Quota attainment %: won amount over quota (0 when no quota set)"
                   value = (($u.quota_amount == null || $u.quota_amount == 0) ? 0 : (($won_amount * 100 / $u.quota_amount)|round:1))
                 }
-                function.run "attainment_band" {
+                function.run "calc/attainment_band" {
                   description = "Map attainment % to its Salesforce-style color band"
                   input = { pct: $att }
                 } as $band

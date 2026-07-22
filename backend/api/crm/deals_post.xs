@@ -17,7 +17,7 @@ query "deals" verb=POST {
     text lead_source?
   }
   stack {
-    function.run "create_deal" {
+    function.run "deals/create_deal" {
       description = "Create the deal, snapshotting probability/forecast from the stage and computing expected revenue"
       input = {
         name: $input.name,

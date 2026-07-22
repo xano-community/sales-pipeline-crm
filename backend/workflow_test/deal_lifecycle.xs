@@ -22,19 +22,19 @@ workflow_test "sales_pipeline_crm_deal_lifecycle" {
       data = { name: "Lifecycle Test Co", owner_id: $mgr.id }
     } as $acct
 
-    function.call "create_deal" {
+    function.call "deals/create_deal" {
       input = { name: "Lifecycle Deal", account_id: $acct.id, owner_id: $mgr.id, stage_id: $s1.id, amount: 100000 }
     } as $deal
     expect.to_equal ($deal.probability) { value = $s1.default_probability }
     expect.to_be_greater_than ($deal.expected_revenue) { value = -1 }
 
-    function.call "advance_deal" {
+    function.call "deals/advance_deal" {
       input = { deal_id: $deal.id, target_stage_id: $s2.id, actor_id: $mgr.id, actor_role: "manager" }
     } as $adv
     expect.to_equal ($adv.stage_id) { value = $s2.id }
     expect.to_equal ($adv.probability) { value = $s2.default_probability }
 
-    function.call "win_deal" {
+    function.call "deals/win_deal" {
       input = { deal_id: $deal.id, actor_id: $mgr.id, actor_role: "manager" }
     } as $won
     expect.to_be_true ($won.is_won)

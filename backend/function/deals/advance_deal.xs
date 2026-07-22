@@ -2,7 +2,7 @@
 // Reps advance one stage forward at a time; managers may jump. Writes a
 // deal_stage_history row (Salesforce OpportunityHistory) with days-in-previous-
 // stage and re-snapshots probability + forecast category + expected revenue.
-function "advance_deal" {
+function "deals/advance_deal" {
   description = "Advance a deal to another open stage with Salesforce-style guards and stage history."
   input {
     int deal_id
@@ -90,7 +90,7 @@ function "advance_deal" {
           description = "Timestamp the deal entered its current stage (or created_at if none)"
           value = ($last == null ? $deal.created_at : $last.changed_at)
         }
-        function.run "days_between" {
+        function.run "calc/days_between" {
           description = "Compute days spent in the previous stage"
           input = { from_ts: $prev_ts, to_ts: now }
         } as $days
@@ -98,7 +98,7 @@ function "advance_deal" {
           description = "Probability to apply: the override or the target stage default"
           value = ($input.probability == null ? $target.default_probability : $input.probability)
         }
-        function.run "calc_expected_revenue" {
+        function.run "calc/calc_expected_revenue" {
           description = "Recompute weighted expected revenue at the new probability"
           input = { amount: $deal.amount, probability: $prob }
         } as $er

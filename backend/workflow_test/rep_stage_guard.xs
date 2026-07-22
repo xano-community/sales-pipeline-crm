@@ -20,10 +20,10 @@ workflow_test "sales_pipeline_crm_rep_stage_guard" {
         db.add "account" {
           data = { name: "Guardrail Test Co", owner_id: $rep.id }
         } as $acct
-        function.call "create_deal" {
+        function.call "deals/create_deal" {
           input = { name: "Guardrail Deal", account_id: $acct.id, owner_id: $rep.id, stage_id: $s1.id, amount: 50000 }
         } as $deal
-        function.call "advance_deal" {
+        function.call "deals/advance_deal" {
           input = { deal_id: $deal.id, target_stage_id: $s3.id, actor_id: $rep.id, actor_role: "rep" }
         } as $bad
       }

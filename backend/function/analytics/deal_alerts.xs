@@ -1,7 +1,7 @@
 // The three Salesforce Opportunity Kanban attention alerts.
 // Ref: help.salesforce.com kanban_use - "three types of alerts: overdue tasks,
 // no open activities, or no activity for 30 days." Closed deals never alert.
-function "deal_alerts" {
+function "analytics/deal_alerts" {
   description = "Computes the three Salesforce Kanban attention flags for a deal."
   input {
     bool is_closed

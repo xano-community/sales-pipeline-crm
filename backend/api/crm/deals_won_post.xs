@@ -14,7 +14,7 @@ query "deals/{deal_id}/won" verb=POST {
       field_name = "id"
       field_value = $auth.id
     } as $me
-    function.run "win_deal" {
+    function.run "deals/win_deal" {
       description = "Close the deal as Won"
       input = { deal_id: $input.deal_id, actor_id: $auth.id, actor_role: $me.role }
     } as $final

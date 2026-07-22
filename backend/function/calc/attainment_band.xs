@@ -1,7 +1,7 @@
 // Quota-attainment color band, mirroring Salesforce Collaborative Forecasts.
 // Ref: help.salesforce.com forecasts3_quotas_intro - attainment is shown with
 // color-coded progress (grey 0%, red 1-33%, orange 34-66%, green 67%+).
-function "attainment_band" {
+function "calc/attainment_band" {
   description = "Maps a quota-attainment percentage to Salesforce's color band (grey/red/orange/green)."
   input {
     decimal pct

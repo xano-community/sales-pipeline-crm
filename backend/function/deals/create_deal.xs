@@ -1,7 +1,7 @@
 // Core deal-creation logic (shared by the endpoint and the tests). Snapshots
 // probability + forecast category from the stage (rep may override probability),
 // computes ExpectedRevenue, and writes the opening stage-history row.
-function "create_deal" {
+function "deals/create_deal" {
   description = "Create a deal, snapshotting probability + forecast category from the stage and computing expected revenue."
   input {
     text name
@@ -30,7 +30,7 @@ function "create_deal" {
       description = "Probability for the new deal: the rep override or the stage default"
       value = ($input.probability == null ? $stage.default_probability : $input.probability)
     }
-    function.run "calc_expected_revenue" {
+    function.run "calc/calc_expected_revenue" {
       description = "Compute weighted expected revenue for the new deal"
       input = { amount: $input.amount, probability: $prob }
     } as $er

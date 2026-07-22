@@ -6,7 +6,7 @@
 //   Closed Only = Closed
 // Category rollups are raw (unweighted) amounts. `weighted_expected` is the
 // separate probability-weighted ExpectedRevenue sum over open deals.
-function "forecast_rollup" {
+function "analytics/forecast_rollup" {
   description = "Cumulative unweighted forecast rollup by Salesforce forecast category, plus a weighted expected-revenue total."
   input {
     json deals

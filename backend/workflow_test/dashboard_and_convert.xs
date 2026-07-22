@@ -10,7 +10,7 @@ workflow_test "sales_pipeline_crm_dashboard_and_convert" {
 
     // Forecast rollup over the whole seeded book.
     db.query "deal" {} as $deals
-    function.call "forecast_rollup" {
+    function.call "analytics/forecast_rollup" {
       input = { deals: $deals }
     } as $forecast
     expect.to_be_greater_than ($forecast.closed_only) { value = 0 }
@@ -28,7 +28,7 @@ workflow_test "sales_pipeline_crm_dashboard_and_convert" {
     } as $lead
     expect.to_not_be_null ($lead)
 
-    function.call "convert_lead" {
+    function.call "deals/convert_lead" {
       input = { lead_id: $lead.id, actor_id: $rep.id, create_opportunity: true, opportunity_name: "Converted Opp", amount: 40000 }
     } as $converted
     expect.to_not_be_null ($converted.opportunity_id)

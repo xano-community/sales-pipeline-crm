@@ -1,7 +1,7 @@
 // Core lead-conversion logic (shared by the endpoint and the tests). Creates or
 // links an account + contact and optionally an opportunity, then flags the lead
 // converted with the created record ids — Salesforce convertLead.
-function "convert_lead" {
+function "deals/convert_lead" {
   description = "Convert a lead into an account, contact, and optional opportunity (Salesforce convertLead)."
   input {
     int lead_id
@@ -80,7 +80,7 @@ function "convert_lead" {
               description = "Snapshot the stage's default probability onto the new deal"
               value = $stage.default_probability
             }
-            function.run "calc_expected_revenue" {
+            function.run "calc/calc_expected_revenue" {
               description = "Compute weighted expected revenue for the new deal"
               input = { amount: $input.amount, probability: $prob }
             } as $er

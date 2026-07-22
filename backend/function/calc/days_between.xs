@@ -1,7 +1,7 @@
 // Whole days between two epoch-millisecond timestamps (floored).
 // Used to record days_in_previous_stage on each stage transition (Salesforce
 // OpportunityHistory records a new entry on every stage change).
-function "days_between" {
+function "calc/days_between" {
   description = "Whole days between two epoch-millisecond timestamps, floored (never negative)."
   input {
     int from_ts

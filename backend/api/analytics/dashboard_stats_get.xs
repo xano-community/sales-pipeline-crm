@@ -22,7 +22,7 @@ query "dashboard/stats" verb=GET {
       where = $is_mgr == true || $db.deal.owner_id == $auth.id
     } as $deals
 
-    function.run "forecast_rollup" {
+    function.run "analytics/forecast_rollup" {
       description = "Compute cumulative forecast columns and weighted ExpectedRevenue"
       input = { deals: $deals }
     } as $forecast
@@ -67,7 +67,7 @@ query "dashboard/stats" verb=GET {
                   description = "Reference timestamp for staleness: last activity, else created date"
                   value = ($d.last_activity_at == null ? $d.created_at : $d.last_activity_at)
                 }
-                function.run "days_between" {
+                function.run "calc/days_between" {
                   description = "Days elapsed since the deal's last activity"
                   input = { from_ts: $ref, to_ts: now }
                 } as $rd
@@ -188,7 +188,7 @@ query "dashboard/stats" verb=GET {
                   description = "Quota attainment %: won amount over quota (0 when no quota set)"
                   value = (($u.quota_amount == null || $u.quota_amount == 0) ? 0 : (($usum * 100 / $u.quota_amount)|round:1))
                 }
-                function.run "attainment_band" {
+                function.run "calc/attainment_band" {
                   description = "Map attainment % to its Salesforce-style color band"
                   input = { pct: $att }
                 } as $band

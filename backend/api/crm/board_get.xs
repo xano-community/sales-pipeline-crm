@@ -56,11 +56,11 @@ query "board" verb=GET {
                   description = "Reference timestamp for staleness: last activity date, or created date if none"
                   value = ($d.last_activity_at == null ? $d.created_at : $d.last_activity_at)
                 }
-                function.run "days_between" {
+                function.run "calc/days_between" {
                   description = "Days since the deal's last activity"
                   input = { from_ts: $ref_ts, to_ts: now }
                 } as $ref_days
-                function.run "deal_alerts" {
+                function.run "analytics/deal_alerts" {
                   description = "Derive the overdue-task, no-open-activity, and stale alert flags"
                   input = {
                     is_closed: $d.is_closed,

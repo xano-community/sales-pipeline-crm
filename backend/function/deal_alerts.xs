@@ -10,17 +10,39 @@ function "deal_alerts" {
     int reference_days
   }
   stack {
-    var $overdue { value = false }
-    var $no_open { value = false }
-    var $stale { value = false }
+    var $overdue {
+      description = "Overdue-task alert flag, off by default"
+      value = false
+    }
+    var $no_open {
+      description = "No-open-activities alert flag, off by default"
+      value = false
+    }
+    var $stale {
+      description = "No-activity-for-30-days alert flag, off by default"
+      value = false
+    }
+    // Closed deals never raise attention alerts
     conditional {
       if ($input.is_closed == false) {
-        var.update $overdue { value = $input.has_overdue_task }
-        var.update $no_open { value = ($input.has_open_activity == false) }
-        var.update $stale { value = ($input.reference_days >= 30) }
+        var.update $overdue {
+          description = "Flag when the deal has an overdue task"
+          value = $input.has_overdue_task
+        }
+        var.update $no_open {
+          description = "Flag when the deal has no open activity"
+          value = ($input.has_open_activity == false)
+        }
+        var.update $stale {
+          description = "Flag when there's been no activity for 30+ days"
+          value = ($input.reference_days >= 30)
+        }
       }
     }
-    var $needs { value = ($overdue || $no_open || $stale) }
+    var $needs {
+      description = "Deal needs attention if any of the three alerts fired"
+      value = ($overdue || $no_open || $stale)
+    }
   }
   response = {
     overdue_task: $overdue,

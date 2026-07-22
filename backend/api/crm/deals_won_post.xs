@@ -10,10 +10,12 @@ query "deals/{deal_id}/won" verb=POST {
   }
   stack {
     db.get "user" {
+      description = "Load the acting user to pass their role into the guarded close"
       field_name = "id"
       field_value = $auth.id
     } as $me
     function.run "win_deal" {
+      description = "Close the deal as Won"
       input = { deal_id: $input.deal_id, actor_id: $auth.id, actor_role: $me.role }
     } as $final
   }

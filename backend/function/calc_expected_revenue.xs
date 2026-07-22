@@ -8,7 +8,10 @@ function "calc_expected_revenue" {
     int probability
   }
   stack {
-    var $expected { value = ($input.amount * $input.probability / 100)|round:2 }
+    var $expected {
+      description = "Weighted expected revenue: amount * probability / 100, rounded to cents"
+      value = ($input.amount * $input.probability / 100)|round:2
+    }
   }
   response = $expected
 

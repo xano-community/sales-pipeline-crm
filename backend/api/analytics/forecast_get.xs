@@ -8,42 +8,71 @@ query "forecast" verb=GET {
   input {}
   stack {
     db.get "user" {
+      description = "Load the acting user to decide manager-wide vs own-book scope"
       field_name = "id"
       field_value = $auth.id
     } as $me
-    var $is_mgr { value = ($me.role == "manager") }
+    var $is_mgr {
+      description = "True when the acting user is a manager (sees every rep)"
+      value = ($me.role == "manager")
+    }
     db.query "user" {
+      description = "List all reps/managers, alphabetized, to build forecast rows"
       sort = { name: "asc" }
     } as $users
-    var $rows { value = [] }
+    var $rows {
+      description = "Accumulator for the per-rep forecast rows"
+      value = []
+    }
+    // Managers get a row per rep; a rep only sees their own line
     foreach ($users) {
+      description = "Walk each user and build their forecast row if in scope"
       each as $u {
         conditional {
           if ($is_mgr == true || $u.id == $auth.id) {
             db.query "deal" {
+              description = "Pull every deal owned by this rep"
               where = $db.deal.owner_id == $u.id
             } as $udeals
-            var $won_amount { value = 0 }
-            var $weighted_open { value = 0 }
+            var $won_amount {
+              description = "Running total of this rep's closed-won amount"
+              value = 0
+            }
+            var $weighted_open {
+              description = "Running total of this rep's weighted open pipeline"
+              value = 0
+            }
             foreach ($udeals) {
+              description = "Tally won amount and weighted open pipeline across the rep's deals"
               each as $d {
                 conditional {
                   if ($d.status == "won") {
-                    var.update $won_amount { value = $won_amount + $d.amount }
+                    var.update $won_amount {
+                      description = "Add this closed-won deal's amount to the won total"
+                      value = $won_amount + $d.amount
+                    }
                   }
                 }
                 conditional {
                   if ($d.status == "open") {
-                    var.update $weighted_open { value = $weighted_open + $d.expected_revenue }
+                    var.update $weighted_open {
+                      description = "Add this open deal's ExpectedRevenue to weighted pipeline"
+                      value = $weighted_open + $d.expected_revenue
+                    }
                   }
                 }
               }
             }
-            var $att { value = (($u.quota_amount == null || $u.quota_amount == 0) ? 0 : (($won_amount * 100 / $u.quota_amount)|round:1)) }
+            var $att {
+              description = "Quota attainment %: won amount over quota (0 when no quota set)"
+              value = (($u.quota_amount == null || $u.quota_amount == 0) ? 0 : (($won_amount * 100 / $u.quota_amount)|round:1))
+            }
             function.run "attainment_band" {
+              description = "Map attainment % to its Salesforce-style color band"
               input = { pct: $att }
             } as $band
             var.update $rows {
+              description = "Append the assembled forecast row for this rep"
               value = $rows|push:({
                 user_id: $u.id,
                 name: $u.name,

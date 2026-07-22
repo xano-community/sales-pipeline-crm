@@ -17,18 +17,25 @@ function "create_deal" {
   }
   stack {
     db.get "pipeline_stage" {
+      description = "Load the opening stage to snapshot its probability and forecast category"
       field_name = "id"
       field_value = $input.stage_id
     } as $stage
+    // Opening stage must exist
     precondition ($stage != null) {
       error_type = "inputerror"
       error = "Unknown stage"
     }
-    var $prob { value = ($input.probability == null ? $stage.default_probability : $input.probability) }
+    var $prob {
+      description = "Probability for the new deal: the rep override or the stage default"
+      value = ($input.probability == null ? $stage.default_probability : $input.probability)
+    }
     function.run "calc_expected_revenue" {
+      description = "Compute weighted expected revenue for the new deal"
       input = { amount: $input.amount, probability: $prob }
     } as $er
     db.add "deal" {
+      description = "Create the deal with stage-snapshotted probability, forecast category, and expected revenue"
       data = {
         name: $input.name,
         account_id: $input.account_id,
@@ -49,6 +56,7 @@ function "create_deal" {
       }
     } as $deal
     db.add "deal_stage_history" {
+      description = "Write the opening stage-history row for the new deal"
       data = {
         deal_id: $deal.id,
         from_stage_id: null,

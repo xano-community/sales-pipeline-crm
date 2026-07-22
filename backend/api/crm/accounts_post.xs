@@ -11,6 +11,7 @@ query "accounts" verb=POST {
   }
   stack {
     db.add "account" {
+      description = "Create the account owned by the authenticated rep"
       data = {
         name: $input.name,
         industry: $input.industry,

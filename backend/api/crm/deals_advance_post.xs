@@ -14,10 +14,12 @@ query "deals/{deal_id}/advance" verb=POST {
   }
   stack {
     db.get "user" {
+      description = "Load the acting user to pass their role into the guarded transition"
       field_name = "id"
       field_value = $auth.id
     } as $me
     function.run "advance_deal" {
+      description = "Run the guarded stage transition, logging history and re-snapshotting probability"
       input = {
         deal_id: $input.deal_id,
         target_stage_id: $input.stage_id,

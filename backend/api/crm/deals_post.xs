@@ -18,6 +18,7 @@ query "deals" verb=POST {
   }
   stack {
     function.run "create_deal" {
+      description = "Create the deal, snapshotting probability/forecast from the stage and computing expected revenue"
       input = {
         name: $input.name,
         account_id: $input.account_id,

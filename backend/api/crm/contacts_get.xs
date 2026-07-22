@@ -8,6 +8,7 @@ query "contacts" verb=GET {
   }
   stack {
     db.query "contact" {
+      description = "List contacts, optionally scoped to the given account, ordered by last name"
       where = $db.contact.account_id ==? $input.account_id
       sort = { last_name: "asc" }
     } as $contacts

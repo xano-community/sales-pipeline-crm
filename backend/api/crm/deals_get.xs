@@ -9,11 +9,16 @@ query "deals" verb=GET {
   }
   stack {
     db.get "user" {
+      description = "Load the acting user to determine their role"
       field_name = "id"
       field_value = $auth.id
     } as $me
-    var $is_mgr { value = ($me.role == "manager") }
+    var $is_mgr {
+      description = "True when the acting user is a manager (sees all deals)"
+      value = ($me.role == "manager")
+    }
     db.query "deal" {
+      description = "List deals scoped by role and optional stage/status filters"
       where = ($is_mgr == true || $db.deal.owner_id == $auth.id) && $db.deal.stage_id ==? $input.stage_id && $db.deal.status ==? $input.status
       sort = { updated_at: "desc" }
     } as $deals

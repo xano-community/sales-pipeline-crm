@@ -8,6 +8,7 @@ query "activity-feed" verb=GET {
   input {}
   stack {
     db.query "deal_stage_history" {
+      description = "Fetch the latest stage transitions joined to deal, actor, and destination stage"
       join = {
         deal: { table: "deal", where: $db.deal_stage_history.deal_id == $db.deal.id }
         user: { table: "user", where: $db.deal_stage_history.changed_by == $db.user.id }

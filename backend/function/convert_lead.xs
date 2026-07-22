@@ -13,29 +13,36 @@ function "convert_lead" {
   }
   stack {
     db.get "lead" {
+      description = "Load the lead being converted"
       field_name = "id"
       field_value = $input.lead_id
     } as $lead
+    // Lead must exist
     precondition ($lead != null) {
       error_type = "notfound"
       error = "Lead not found"
     }
+    // Conversion is one-way; don't re-convert
     precondition ($lead.is_converted == false) {
       error_type = "inputerror"
       error = "Lead is already converted"
     }
     db.get "account" {
+      description = "Look for an existing account matching the lead's company"
       field_name = "name"
       field_value = $lead.company
     } as $account
+    // Create the account only if the company isn't already on file
     conditional {
       if ($account == null) {
         db.add "account" {
+          description = "Create a new account from the lead's company"
           data = { name: $lead.company, owner_id: $input.actor_id }
         } as $account
       }
     }
     db.add "contact" {
+      description = "Create the contact from the lead's person details"
       data = {
         account_id: $account.id,
         first_name: $lead.first_name,
@@ -43,19 +50,29 @@ function "convert_lead" {
         email: $lead.email
       }
     } as $contact
-    var $opp_id { value = null }
+    var $opp_id {
+      description = "Converted opportunity id, populated only if an opportunity is created"
+      value = null
+    }
+    // Optionally spin up an opportunity as part of the conversion
     conditional {
       if ($input.create_opportunity == true) {
         db.query "pipeline_stage" {
+          description = "Resolve the requested opening stage, or the earliest stage by sort order"
           where = $db.pipeline_stage.id ==? $input.stage_id
           sort = { sort_order: "asc" }
           return = { type: "single" }
         } as $stage
-        var $prob { value = $stage.default_probability }
+        var $prob {
+          description = "Snapshot the stage's default probability onto the new deal"
+          value = $stage.default_probability
+        }
         function.run "calc_expected_revenue" {
+          description = "Compute weighted expected revenue for the new deal"
           input = { amount: $input.amount, probability: $prob }
         } as $er
         db.add "deal" {
+          description = "Create the opportunity for the converted lead"
           data = {
             name: ($input.opportunity_name == null ? ($lead.company ~ " - New Opportunity") : $input.opportunity_name),
             account_id: $account.id,
@@ -73,6 +90,7 @@ function "convert_lead" {
           }
         } as $deal
         db.add "deal_stage_history" {
+          description = "Write the opening stage-history row for the new opportunity"
           data = {
             deal_id: $deal.id,
             from_stage_id: null,
@@ -85,12 +103,17 @@ function "convert_lead" {
           }
         }
         db.add "opportunity_contact_role" {
+          description = "Link the converted contact to the deal as primary decision maker"
           data = { deal_id: $deal.id, contact_id: $contact.id, role: "decision_maker", is_primary: true }
         }
-        var.update $opp_id { value = $deal.id }
+        var.update $opp_id {
+          description = "Record the created opportunity id for the response and lead link"
+          value = $deal.id
+        }
       }
     }
     db.patch "lead" {
+      description = "Flag the lead converted and link the created account, contact, and opportunity"
       field_name = "id"
       field_value = $input.lead_id
       data = {

@@ -8,6 +8,7 @@ query "login" verb=POST {
   }
   stack {
     db.get "user" {
+      description = "Look up the user by email to verify the login"
       field_name = "email"
       field_value = $input.email
     } as $user

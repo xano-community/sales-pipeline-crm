@@ -6,6 +6,7 @@ query "stages" verb=GET {
   input {}
   stack {
     db.query "pipeline_stage" {
+      description = "List all pipeline stages in display order"
       sort = { sort_order: "asc" }
     } as $stages
   }

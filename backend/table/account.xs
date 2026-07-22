@@ -1,12 +1,14 @@
 table "account" {
+  description = "Companies you sell to — the customer/organization records deals and contacts hang off of (Salesforce Account)."
   auth = false
   schema {
     int id
-    text name filters=trim
-    text industry?
-    text website?
-    decimal annual_revenue?=0
+    text name filters=trim { description = "Company/organization name" }
+    text industry? { description = "Industry vertical the account operates in" }
+    text website? { description = "Account's primary website URL" }
+    decimal annual_revenue?=0 { description = "Account's reported annual revenue, used for segmentation and prioritization" }
     int owner_id {
+      description = "Sales rep who owns this account"
       table = "user"
     }
     timestamp created_at?=now

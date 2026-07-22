@@ -13,6 +13,7 @@ query "leads" verb=POST {
   }
   stack {
     db.add "lead" {
+      description = "Insert a new lead defaulting rating to warm and status to new/unconverted"
       data = {
         first_name: $input.first_name,
         last_name: $input.last_name,

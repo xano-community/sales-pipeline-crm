@@ -10,6 +10,7 @@ query "signup" verb=POST {
   }
   stack {
     db.has "user" {
+      description = "Check whether a user already exists with this email"
       field_name = "email"
       field_value = $input.email
     } as $exists
@@ -18,6 +19,7 @@ query "signup" verb=POST {
       error = "Email already registered"
     }
     db.add "user" {
+      description = "Create the new rep or manager account (defaults role to rep)"
       data = {
         name: $input.name,
         email: $input.email,

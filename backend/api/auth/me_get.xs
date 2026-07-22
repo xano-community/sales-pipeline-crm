@@ -6,6 +6,7 @@ query "me" verb=GET {
   input {}
   stack {
     db.get "user" {
+      description = "Load the authenticated user's own profile record"
       field_name = "id"
       field_value = $auth.id
     } as $user

@@ -15,6 +15,7 @@ query "leads/{lead_id}/convert" verb=POST {
   }
   stack {
     function.run "convert_lead" {
+      description = "Convert the lead into an account, contact, and optional opportunity, then flag it converted"
       input = {
         lead_id: $input.lead_id,
         actor_id: $auth.id,

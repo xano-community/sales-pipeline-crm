@@ -7,20 +7,35 @@ function "attainment_band" {
     decimal pct
   }
   stack {
-    var $band { value = "grey" }
+    var $band {
+      description = "Default attainment band before thresholds are applied"
+      value = "grey"
+    }
+    // 1-33% attainment shows red
     conditional {
       if ($input.pct >= 1 && $input.pct < 34) {
-        var.update $band { value = "red" }
+        var.update $band {
+          description = "Low attainment: red band"
+          value = "red"
+        }
       }
     }
+    // 34-66% attainment shows orange
     conditional {
       if ($input.pct >= 34 && $input.pct < 67) {
-        var.update $band { value = "orange" }
+        var.update $band {
+          description = "Mid attainment: orange band"
+          value = "orange"
+        }
       }
     }
+    // 67%+ attainment shows green
     conditional {
       if ($input.pct >= 67) {
-        var.update $band { value = "green" }
+        var.update $band {
+          description = "On/over quota: green band"
+          value = "green"
+        }
       }
     }
   }

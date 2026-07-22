@@ -8,6 +8,7 @@ query "leads" verb=GET {
   }
   stack {
     db.query "lead" {
+      description = "List leads, optionally filtered by status, newest first"
       where = $db.lead.status ==? $input.status
       sort = { created_at: "desc" }
     } as $leads

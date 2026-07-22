@@ -8,13 +8,23 @@ function "days_between" {
     int to_ts
   }
   stack {
-    var $diff { value = $input.to_ts - $input.from_ts }
+    var $diff {
+      description = "Elapsed milliseconds between the two timestamps"
+      value = $input.to_ts - $input.from_ts
+    }
+    // Clamp negative spans to zero so days-in-stage is never negative
     conditional {
       if ($diff < 0) {
-        var.update $diff { value = 0 }
+        var.update $diff {
+          description = "Clamp a negative span to zero"
+          value = 0
+        }
       }
     }
-    var $days { value = ($diff / 86400000)|floor }
+    var $days {
+      description = "Whole days in the span, flooring partial days"
+      value = ($diff / 86400000)|floor
+    }
   }
   response = $days
 

@@ -13,6 +13,7 @@ query "contacts" verb=POST {
   }
   stack {
     db.add "contact" {
+      description = "Create the contact under the given account"
       data = {
         account_id: $input.account_id,
         first_name: $input.first_name,

@@ -1,3 +1,13 @@
+---
+name: Backend authoring conventions
+description: XanoScript authoring rules for this template — describe every construct, field, and statement, and group related logic.
+knowledge_type: agents.md
+scope: workspace
+inclusion: always
+enabled: true
+guid: 2uBarosuv1kek9099ocH8XvsZF8
+---
+
 # AGENTS.md — editing this template's XanoScript backend
 
 This template is meant to be **forked into a Xano workspace and read in the visual builder**, so the

@@ -30,60 +30,70 @@ query "forecast" verb=GET {
       each as $u {
         conditional {
           if ($is_mgr == true || $u.id == $auth.id) {
-            db.query "deal" {
-              description = "Pull every deal owned by this rep"
-              where = $db.deal.owner_id == $u.id
-            } as $udeals
-            var $won_amount {
-              description = "Running total of this rep's closed-won amount"
-              value = 0
-            }
-            var $weighted_open {
-              description = "Running total of this rep's weighted open pipeline"
-              value = 0
-            }
-            foreach ($udeals) {
-              description = "Tally won amount and weighted open pipeline across the rep's deals"
-              each as $d {
-                conditional {
-                  if ($d.status == "won") {
-                    var.update $won_amount {
-                      description = "Add this closed-won deal's amount to the won total"
-                      value = $won_amount + $d.amount
-                    }
-                  }
+            group {
+              description = "Accumulate this rep's won amount and weighted open pipeline"
+              stack {
+                db.query "deal" {
+                  description = "Pull every deal owned by this rep"
+                  where = $db.deal.owner_id == $u.id
+                } as $udeals
+                var $won_amount {
+                  description = "Running total of this rep's closed-won amount"
+                  value = 0
                 }
-                conditional {
-                  if ($d.status == "open") {
-                    var.update $weighted_open {
-                      description = "Add this open deal's ExpectedRevenue to weighted pipeline"
-                      value = $weighted_open + $d.expected_revenue
+                var $weighted_open {
+                  description = "Running total of this rep's weighted open pipeline"
+                  value = 0
+                }
+                foreach ($udeals) {
+                  description = "Tally won amount and weighted open pipeline across the rep's deals"
+                  each as $d {
+                    conditional {
+                      if ($d.status == "won") {
+                        var.update $won_amount {
+                          description = "Add this closed-won deal's amount to the won total"
+                          value = $won_amount + $d.amount
+                        }
+                      }
+                    }
+                    conditional {
+                      if ($d.status == "open") {
+                        var.update $weighted_open {
+                          description = "Add this open deal's ExpectedRevenue to weighted pipeline"
+                          value = $weighted_open + $d.expected_revenue
+                        }
+                      }
                     }
                   }
                 }
               }
             }
-            var $att {
-              description = "Quota attainment %: won amount over quota (0 when no quota set)"
-              value = (($u.quota_amount == null || $u.quota_amount == 0) ? 0 : (($won_amount * 100 / $u.quota_amount)|round:1))
-            }
-            function.run "attainment_band" {
-              description = "Map attainment % to its Salesforce-style color band"
-              input = { pct: $att }
-            } as $band
-            var.update $rows {
-              description = "Append the assembled forecast row for this rep"
-              value = $rows|push:({
-                user_id: $u.id,
-                name: $u.name,
-                role: $u.role,
-                quota: $u.quota_amount,
-                quota_period: $u.quota_period,
-                won_amount: $won_amount,
-                weighted_open: $weighted_open|round:2,
-                attainment_pct: $att,
-                band: $band.band
-              })
+            group {
+              description = "Roll up the rep's totals into a forecast row"
+              stack {
+                var $att {
+                  description = "Quota attainment %: won amount over quota (0 when no quota set)"
+                  value = (($u.quota_amount == null || $u.quota_amount == 0) ? 0 : (($won_amount * 100 / $u.quota_amount)|round:1))
+                }
+                function.run "attainment_band" {
+                  description = "Map attainment % to its Salesforce-style color band"
+                  input = { pct: $att }
+                } as $band
+                var.update $rows {
+                  description = "Append the assembled forecast row for this rep"
+                  value = $rows|push:({
+                    user_id: $u.id,
+                    name: $u.name,
+                    role: $u.role,
+                    quota: $u.quota_amount,
+                    quota_period: $u.quota_period,
+                    won_amount: $won_amount,
+                    weighted_open: $weighted_open|round:2,
+                    attainment_pct: $att,
+                    band: $band.band
+                  })
+                }
+              }
             }
           }
         }

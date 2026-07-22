@@ -229,7 +229,11 @@
 <script>
 const LS = { cfg:'salescrm:cfg', token:'salescrm:token', user:'salescrm:user' };
 let cfg = loadCfg(); let STAGES=[]; let DASH=null; const EXP=new Set(['all']); let DRAGID=null;
-const AUTH='/api:salescrm-auth', CRM='/api:salescrm-crm', AN='/api:salescrm-analytics', SEED='/api:salescrm-seed';
+// API groups — Xano assigns each group's `api:<canonical>` slug uniquely per workspace on push, so these
+// are filled in at install time. The installer (start-xano-with-template) replaces the __CANON_*__
+// placeholders with this workspace's real canonicals before deploying the frontend; a manual forker sets
+// them from `xano workspace pull` → api/<group>/*.xs. Until then the app can't reach its API.
+const AUTH='/api:__CANON_AUTH__', CRM='/api:__CANON_CRM__', AN='/api:__CANON_ANALYTICS__', SEED='/api:__CANON_SEED__';
 
 /* ---- inline SVG icons ---- */
 const IC = {
